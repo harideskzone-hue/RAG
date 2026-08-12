@@ -9,9 +9,7 @@ class ResponseCoordinator:
     Separates orchestration from presentation.
     """
     def generate_response(self, context: VistaContext) -> dict[str, Any]:
-        print(f"EVIDENCE BUNDLE: {context.evidence_bundle}")
-        print(f"RESULTS: {context.results.keys()}")
-        print(f"UNAUTHORIZED: {context.results.get('unauthorized_evidence_found')}")
+
 
         # Extract evidence from bundle if present
         bundle_evidence = []
