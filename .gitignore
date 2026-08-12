@@ -66,6 +66,7 @@ dmypy.json
 # Datasets and models
 dataset/*
 !dataset/*.json
+!dataset/*.npy
 !dataset/storage/
 dataset/storage/*
 !dataset/storage/vista-video-bucket/
