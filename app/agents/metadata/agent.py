@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from app.agents.base_agent import BaseAgent
@@ -93,7 +93,7 @@ class MetadataAgent(BaseAgent):
                     evidence_type=EvidenceType.METADATA,
                     source="metadata_agent",
                     confidence=0.95,  # High confidence for deterministic metadata, but not hardcoded to 1.0
-                    timestamp=datetime.utcnow() if hasattr(datetime, 'utcnow') else datetime.now(),
+                    timestamp=datetime.now(timezone.utc),
                     trace_id=context.execution_id,
                     metadata={"camera_id": cam.id, "description": f"Camera {cam.id} is {cam.status} at {cam.location}"}
                 ))

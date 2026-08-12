@@ -1,7 +1,7 @@
 import pytest
 import asyncio
 from uuid import uuid4
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timezone
 
 from app.domain.models.reasoning_context import ReasoningContext
 from app.domain.models.entity import Entity
@@ -49,8 +49,8 @@ async def test_reasoning_pipeline_integration():
                     evidence_type=EvidenceType.VECTOR,
                     source="vector",
                     confidence=0.9,
-                    created_at=datetime.utcnow().replace(tzinfo=timezone.utc),
-                    timestamp=datetime.utcnow().replace(tzinfo=timezone.utc),
+                    created_at=datetime.now(timezone.utc).replace(tzinfo=timezone.utc),
+                    timestamp=datetime.now(timezone.utc).replace(tzinfo=timezone.utc),
                     trace_id=uuid4(),
                     metadata={"description": "mock person"}
                 )

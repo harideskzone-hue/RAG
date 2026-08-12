@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.agents.confidence.engine import ConfidenceEngine
 from app.agents.intent.enums import Intent
@@ -14,7 +14,7 @@ def test_confidence_engine_high_agreement():
     from uuid import uuid4
     from datetime import timedelta
     
-    base_time = datetime.utcnow()
+    base_time = datetime.now(timezone.utc)
     
     bundle.add_evidence(MetadataEvidence(
         evidence_id=uuid4(), source="postgres_metadata", confidence=1.0, timestamp=base_time, trace_id=uuid4(),
@@ -52,7 +52,7 @@ def test_confidence_engine_low_confidence_clarification():
     bundle = EvidenceBundle()
     from uuid import uuid4
     bundle.add_evidence(MetadataEvidence(
-        evidence_id=uuid4(), source="postgres_metadata", confidence=0.2, timestamp=datetime.utcnow(), trace_id=uuid4()
+        evidence_id=uuid4(), source="postgres_metadata", confidence=0.2, timestamp=datetime.now(timezone.utc), trace_id=uuid4()
     ))
     # Overall score will be low (e.g. ~0.3 - 0.5 depending on weights), which is < 0.8 but > 0.1
     

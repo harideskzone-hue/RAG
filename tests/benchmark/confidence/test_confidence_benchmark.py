@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from app.agents.confidence.engine import ConfidenceEngine
@@ -20,9 +20,9 @@ def test_confidence_engine_latency(benchmark):
     
     bundle = EvidenceBundle(
         evidence=[
-            MetadataEvidence(evidence_id=uuid4(), timestamp=datetime.utcnow(), trace_id=uuid4(), source="postgres_metadata", content={"status": "online"}, metadata={}, confidence=1.0, reasoning=""),
-            PersonEvidence(evidence_id=uuid4(), timestamp=datetime.utcnow(), trace_id=uuid4(), source="milvus_vector", content={"match": True}, metadata={}, confidence=0.8, reasoning=""),
-            VideoEvidence(evidence_id=uuid4(), timestamp=datetime.utcnow(), trace_id=uuid4(), source="s3_video", content={"action": "walking"}, metadata={}, confidence=0.9, reasoning=""),
+            MetadataEvidence(evidence_id=uuid4(), timestamp=datetime.now(timezone.utc), trace_id=uuid4(), source="postgres_metadata", content={"status": "online"}, metadata={}, confidence=1.0, reasoning=""),
+            PersonEvidence(evidence_id=uuid4(), timestamp=datetime.now(timezone.utc), trace_id=uuid4(), source="milvus_vector", content={"match": True}, metadata={}, confidence=0.8, reasoning=""),
+            VideoEvidence(evidence_id=uuid4(), timestamp=datetime.now(timezone.utc), trace_id=uuid4(), source="s3_video", content={"action": "walking"}, metadata={}, confidence=0.9, reasoning=""),
         ]
     )
     

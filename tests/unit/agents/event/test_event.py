@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -22,10 +22,10 @@ async def test_event_agent_end_to_end():
     bundle = EvidenceBundle()
     from uuid import uuid4
     bundle.add_evidence(MetadataEvidence(
-        evidence_id=uuid4(), source="postgres_metadata", confidence=1.0, timestamp=datetime.utcnow(), trace_id=uuid4(), metadata={"camera_id": "cam_1", "description": "Alert: fight detected."}
+        evidence_id=uuid4(), source="postgres_metadata", confidence=1.0, timestamp=datetime.now(timezone.utc), trace_id=uuid4(), metadata={"camera_id": "cam_1", "description": "Alert: fight detected."}
     ))
     bundle.add_evidence(VideoEvidence(
-        evidence_id=uuid4(), source="vlm_gemini", confidence=0.9, timestamp=datetime.utcnow(), trace_id=uuid4(), metadata={"camera_id": "cam_1", "summary": "Two people are fighting."}
+        evidence_id=uuid4(), source="vlm_gemini", confidence=0.9, timestamp=datetime.now(timezone.utc), trace_id=uuid4(), metadata={"camera_id": "cam_1", "summary": "Two people are fighting."}
     ))
     context.evidence_bundle = bundle
     

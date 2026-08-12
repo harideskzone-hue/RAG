@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -32,7 +32,7 @@ async def test_video_agent_end_to_end():
     bundle = EvidenceBundle()
     from uuid import uuid4
     bundle.add_evidence(MetadataEvidence(
-        evidence_id=uuid4(), source="mock", confidence=1.0, timestamp=datetime.utcnow(), trace_id=uuid4(), metadata={"camera_id": "cam_5"}
+        evidence_id=uuid4(), source="mock", confidence=1.0, timestamp=datetime.now(timezone.utc), trace_id=uuid4(), metadata={"camera_id": "cam_5"}
     ))
     context.evidence_bundle = bundle
     

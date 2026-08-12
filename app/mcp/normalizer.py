@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Any, List
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.schemas.context import UserContext
 from app.domain.evidence import PersonEvidence, EvidenceType
@@ -312,7 +312,7 @@ class MCPNormalizer:
                 evidence_id=uuid4(),
                 evidence_type=EvidenceType.METADATA,
                 source="mcp_get_camera_metadata",
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
                 confidence=1.0,
                 trace_id=request_id,
                 metadata={
