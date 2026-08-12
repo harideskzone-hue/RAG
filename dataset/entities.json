@@ -1,0 +1,12 @@
+[
+    {
+        "entity_id": "PERSON_001",
+        "type": "person",
+        "attributes": {
+            "clothing_upper": "red shirt",
+            "clothing_lower": "blue jeans",
+            "accessories": ["black backpack"]
+        },
+        "first_seen": "2026-08-08T10:42:15Z"
+    }
+]

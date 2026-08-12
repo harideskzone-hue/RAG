@@ -1,0 +1,10 @@
+[
+    {
+        "camera_id": "CAM_02",
+        "timestamp": "2026-08-08T10:42:15Z",
+        "location": "Lobby Entrance",
+        "resolution": "1280x720",
+        "fps": 25,
+        "video_file": "cctv.mp4"
+    }
+]

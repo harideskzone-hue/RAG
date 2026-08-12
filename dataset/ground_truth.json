@@ -1,0 +1,20 @@
+[
+    {
+        "query": "Where was the person wearing a red shirt seen?",
+        "expected_entities": ["PERSON_001"],
+        "expected_cameras": ["CAM_02"],
+        "expected_time_range": ["10:42:10", "10:42:20"],
+        "expected_evidence": [
+            "cctv.mp4"
+        ]
+    },
+    {
+        "query": "Show me the last known location of PERSON_001.",
+        "expected_entities": ["PERSON_001"],
+        "expected_cameras": ["CAM_02"],
+        "expected_time_range": ["10:42:15", "10:42:15"],
+        "expected_evidence": [
+            "cctv.mp4"
+        ]
+    }
+]

@@ -1,0 +1,10 @@
+[
+    {
+        "event_id": "EVT_100",
+        "type": "entry",
+        "camera_id": "CAM_02",
+        "timestamp": "2026-08-08T10:42:15Z",
+        "description": "Person entered through lobby",
+        "entities_involved": ["PERSON_001"]
+    }
+]

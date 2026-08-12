@@ -64,7 +64,13 @@ dmypy.json
 .DS_Store
 
 # Datasets and models
-dataset/
+dataset/*
+!dataset/*.json
+!dataset/storage/
+dataset/storage/*
+!dataset/storage/vista-video-bucket/
+dataset/storage/vista-video-bucket/*
+!dataset/storage/vista-video-bucket/*.mp4
 /models/
 /models/**
 *.pt

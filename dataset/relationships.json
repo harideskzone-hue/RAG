@@ -1,0 +1,8 @@
+[
+    {
+        "source": "PERSON_001",
+        "target": "CAM_02",
+        "relation": "OBSERVED_BY",
+        "timestamp": "2026-08-08T10:42:15Z"
+    }
+]
