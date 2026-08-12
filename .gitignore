@@ -65,7 +65,8 @@ dmypy.json
 
 # Datasets and models
 dataset/
-models/
+/models/
+/models/**
 *.pt
 *.pth
 *.bin
