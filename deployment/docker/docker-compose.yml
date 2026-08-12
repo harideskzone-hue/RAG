@@ -1,0 +1,225 @@
+version: '3.8'
+
+services:
+  vista-api:
+    build:
+      context: ../../
+      dockerfile: deployment/docker/Dockerfile
+    container_name: vista-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../.env.local
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - MILVUS_HOST=milvus
+      - MONGO_URI=mongodb://mongo:27017
+      - S3_ENDPOINT=http://minio:9000
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      milvus:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: vista-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=vista_user
+      - POSTGRES_PASSWORD=vista_password
+      - POSTGRES_DB=vista_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vista_user -d vista_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  mongo:
+    image: mongo:7.0
+    container_name: vista-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  redis:
+    image: redis:7-alpine
+    container_name: vista-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  milvus:
+    image: milvusdb/milvus:v2.4.5
+    container_name: vista-milvus
+    restart: unless-stopped
+    command: ["milvus", "run", "standalone"]
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    environment:
+      - ETCD_USE_EMBED=true
+      - ETCD_DATA_DIR=/var/lib/milvus/etcd
+      - ETCD_CONFIG_PATH=/milvus/configs/embedEtcd.yaml
+      - COMMON_STORAGETYPE=local
+    volumes:
+      - milvus_data:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  minio:
+    image: minio/minio:RELEASE.2023-09-07T02-05-02Z
+    container_name: vista-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.104.0
+    container_name: vista-otel
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol-config.yml"]
+    volumes:
+      # In a real setup, we would mount a local otel-config.yaml
+      # For now, we rely on defaults or we can create one if needed
+      # - ./otel-config.yml:/etc/otelcol-config.yml
+      - otel_data:/var/log/
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.50
+    container_name: vista-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686" # UI
+      - "14250:14250" # OTLP gRPC
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: vista-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: vista-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - vista-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+networks:
+  vista-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongo_data:
+  redis_data:
+  milvus_data:
+  minio_data:
+  otel_data:

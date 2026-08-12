@@ -1,0 +1,118 @@
+/* Buttons */
+.btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-sans);
+}
+
+.btn:hover {
+  box-shadow: 0 0 15px var(--primary-glow);
+  transform: translateY(-2px);
+}
+
+/* Chat Input */
+.chat-input-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.chat-input {
+  flex-grow: 1;
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.chat-input:focus {
+  border-color: var(--secondary);
+}
+
+/* Chat Bubbles */
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  line-height: 1.5;
+}
+
+.bubble.user {
+  background: var(--card);
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.bubble.agent {
+  background: linear-gradient(135deg, rgba(74, 0, 224, 0.1), rgba(142, 45, 226, 0.1));
+  border: 1px solid var(--primary-glow);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+/* Progress / Confidence Bar */
+.progress-container {
+  background: var(--card);
+  border-radius: 20px;
+  height: 10px;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  height: 100%;
+  border-radius: 20px;
+  transition: width 1s ease-in-out;
+}
+
+/* Timeline */
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--text-muted);
+}
+
+.timeline-item.active {
+  color: var(--text-main);
+}
+
+.timeline-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.timeline-item.active .timeline-icon {
+  background: var(--success);
+  color: var(--bg);
+  box-shadow: 0 0 10px var(--success);
+}

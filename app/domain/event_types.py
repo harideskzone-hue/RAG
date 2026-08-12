@@ -1,0 +1,13 @@
+from enum import Enum
+
+
+class EventType(Enum):
+    FIGHT = "FIGHT"
+    FIRE = "FIRE"
+    WEAPON = "WEAPON"
+    CROWD = "CROWD"
+    LOITERING = "LOITERING"
+    INTRUSION = "INTRUSION"
+    PERSON_SEARCH = "PERSON_SEARCH"
+    VEHICLE_SEARCH = "VEHICLE_SEARCH"
+    UNKNOWN = "UNKNOWN"

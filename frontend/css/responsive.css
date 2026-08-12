@@ -1,0 +1,25 @@
+@media (max-width: 1024px) {
+  body {
+    grid-template-columns: 200px 1fr 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    overflow-y: auto;
+  }
+  
+  .sidebar {
+    display: none; /* In a real app, hide behind a hamburger menu */
+  }
+  
+  .right-panel {
+    display: none; /* Hide on mobile to focus on chat */
+  }
+  
+  .chat-panel {
+    min-height: 80vh;
+  }
+}

@@ -1,0 +1,11 @@
+-r requirements.txt
+pytest>=7.4.0
+pytest-asyncio>=0.21.1
+pytest-benchmark>=4.0.0
+locust>=2.15.1
+ruff>=0.0.285
+black>=23.7.0
+mypy>=1.5.1
+bandit>=1.7.5
+pip-audit>=2.6.1
+pipdeptree>=2.13.0
