@@ -160,13 +160,14 @@ class ResponseCoordinator:
                 if not claims and hasattr(reasoning_result, "claims"):
                     claims = getattr(reasoning_result, "claims", [])
                     
-                for claim in claims:
-                    if isinstance(claim, dict):
-                        eids = claim.get("evidence_ids", [])
-                    else:
-                        eids = getattr(claim, "evidence_ids", [])
-                    for eid in eids:
-                        cited_evidence_ids.add(str(eid))
+                if hasattr(claims, "__iter__") and not isinstance(claims, str):
+                    try:
+                        for claim in claims:
+                            cited = claim.get("evidence_ids", []) if isinstance(claim, dict) else getattr(claim, "evidence_ids", [])
+                            if cited and hasattr(cited, "__iter__") and not isinstance(cited, str):
+                                cited_evidence_ids.update(str(c) for c in cited)
+                    except Exception:
+                        pass
             
             # Map valid citations against the EvidenceBundle
             if context.evidence_bundle:
