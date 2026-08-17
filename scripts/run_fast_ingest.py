@@ -112,17 +112,24 @@ async def main():
         shutil.move(str(video_path), str(FAILED_DIR / video_filename))
         return
 
-    print("5. Audit PASSED! Moving video to completed directory and finalizing state...")
-    await update_segment_state(video_filename, status="VERIFIED", camera_id=camera_id, sha256=file_hash)
-    await update_segment_state(video_filename, status="CLEANUP_PENDING", camera_id=camera_id, sha256=file_hash)
-
-    # In production with AUTO_DELETE, it would delete the raw video; here we move to completed for UI serving
-    dest = COMPLETED_DIR / video_filename
-    if video_path.exists() and video_path != dest:
-        shutil.move(str(video_path), str(dest))
-
-    await update_segment_state(video_filename, status="COMPLETED", cleanup_status="RETAINED", camera_id=camera_id, sha256=file_hash)
-    print(f"✓ Video {video_filename} successfully ingested and verified!")
+    # 5. Safe Deletion of Raw Source Video (AUTO_DELETE)
+    auto_delete = os.getenv("AUTO_DELETE_AFTER_VERIFICATION", "true").lower() in ("true", "1", "yes")
+    if auto_delete:
+        print(f"5. Audit PASSED! Auto-deleting raw source video {video_filename} (AUTO_DELETE=true)...")
+        if video_path.exists():
+            video_path.unlink()
+        dest = COMPLETED_DIR / video_filename
+        if dest.exists():
+            dest.unlink()
+        await update_segment_state(video_filename, status="COMPLETED", cleanup_status="DELETED", camera_id=camera_id, sha256=file_hash)
+        print(f"✓ Video {video_filename} successfully ingested, verified, and raw input file deleted!")
+    else:
+        print(f"5. Audit PASSED! Moving video to completed directory and finalizing state...")
+        dest = COMPLETED_DIR / video_filename
+        if video_path.exists() and video_path != dest:
+            shutil.move(str(video_path), str(dest))
+        await update_segment_state(video_filename, status="COMPLETED", cleanup_status="RETAINED", camera_id=camera_id, sha256=file_hash)
+        print(f"✓ Video {video_filename} successfully ingested and verified!")
 
 
 if __name__ == "__main__":
