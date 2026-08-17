@@ -211,8 +211,6 @@ class ChatPresenter:
             return p_id, crop_url, timestamp, clip_url
 
         # Query Target Filtering (Strict Grounding: Do not return wrong or arbitrary persons)
-        FEMALE_PIDS = {"P_16F91D9F", "P_3D9B4B96", "P152", "P128"}
-        
         # Determine query target filter
         q_lower = str(canonical_response.get("query", "")).lower()
         is_women_query = any(w in q_lower for w in ["women", "woman", "female", "lady", "girl"])
@@ -234,13 +232,16 @@ class ChatPresenter:
             if norm_pid:
                 seen_pids.add(norm_pid)
 
-            # Strict Target Filtering
-            if norm_pid:
-                is_female = norm_pid in FEMALE_PIDS or any(fp in norm_pid for fp in FEMALE_PIDS)
-                if is_women_query and not is_female:
-                    continue  # Only show verified female tracks for women queries
-                if is_men_query and is_female:
-                    continue  # Do not show female tracks for men queries
+            # Strict Target Filtering dynamically from evidence metadata
+            meta = e.get("metadata") or {}
+            ev_desc = str(e.get("description") or meta.get("description") or "").lower()
+            ev_gender = str(meta.get("gender") or "").lower()
+            is_female = ev_gender == "female" or "female" in ev_desc or "woman" in ev_desc
+
+            if is_women_query and not is_female:
+                continue
+            if is_men_query and is_female:
+                continue
 
             # Discard non-human/false tracks with no valid crop
             if not crop_url:

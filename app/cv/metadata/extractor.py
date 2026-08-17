@@ -18,8 +18,6 @@ class AutoVideoMetadataExtractor:
     Produces structured JSON metadata for downstream Agentic RAG and forensic reasoning.
     """
 
-    KNOWN_FEMALE_TRACKS = {"P152", "P128", "P_16F91D9F", "P_3D9B4B96"}
-
     def __init__(self, output_dir: str = "dataset/metadata"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -79,21 +77,18 @@ class AutoVideoMetadataExtractor:
     ) -> Dict[str, Any]:
         """
         Extracts motion kinematics, spatial trajectory, behavior, and clothing attributes
-        automatically from track observations.
+        100% dynamically from raw track observations.
         """
         timestamps = []
         bboxes = []
-        crops = []
 
         for obs in observations:
             if hasattr(obs, "provenance"):
                 t = float(obs.provenance.video_timestamp_sec)
                 bbox = getattr(obs.attributes, "bounding_box", [0, 0, 0, 0])
-                ev_id = obs.observation.get("original_evidence_id", "")
             elif isinstance(obs, dict):
                 t = float(obs.get("timestamp_sec", obs.get("timestamp", 0.0)))
                 bbox = obs.get("bbox", [0, 0, 0, 0])
-                ev_id = obs.get("evidence_id", "")
             else:
                 continue
 
@@ -103,17 +98,17 @@ class AutoVideoMetadataExtractor:
         if not timestamps:
             return {
                 "track_id": track_id,
-                "gender": "male",
+                "gender": "individual",
                 "behavior": "present in CCTV coverage",
-                "location": "entrance area",
-                "description": f"Person {track_id} observed in CCTV footage."
+                "location": "camera coverage area",
+                "description": f"Individual {track_id} observed in CCTV footage."
             }
 
         start_t = min(timestamps)
         end_t = max(timestamps)
         duration = max(round(end_t - start_t, 2), 0.5)
 
-        # Centroids
+        # Centroids & Kinematics
         centers = [((b[0] + b[2]) / 2.0, (b[1] + b[3]) / 2.0) for b in bboxes if len(b) == 4]
         if centers:
             start_pos = centers[0]
@@ -125,70 +120,39 @@ class AutoVideoMetadataExtractor:
             net_disp = 0.0
             avg_x, avg_y = 0.5, 0.5
 
-        # Spatial zone mapping & scene context
-        is_crime_scene = video_id and any(kw in video_id.lower() for kw in ["robbery", "snatch", "crime", "theft", "chain", "cctv"])
-        
-        if is_crime_scene:
-            location = "street walkway / building entrance"
-            zone = "street_entrance"
-            
-            # Safe string representations
-            track_id_str = str(track_id or "unknown")
-            is_female = (
-                track_id_str in self.KNOWN_FEMALE_TRACKS
-                or (canonical_pid and any(f in canonical_pid for f in self.KNOWN_FEMALE_TRACKS))
-            )
+        speed = net_disp / duration if duration > 0 else 0.0
 
-            if is_female:
-                behavior = "victim walking on street when targeted and approached in chain snatching incident"
-            elif track_id_str in ("P001", "P002", "P003") or (int(track_id_str.replace("P", "")) <= 3 if track_id_str.replace("P", "").isdigit() else False):
-                behavior = "suspect approaching victim, executing chain snatching robbery, and fleeing the scene"
-            elif net_disp > 80:
-                behavior = "fleeing scene rapidly following chain snatching confrontation"
-            else:
-                behavior = "individual present in CCTV coverage during robbery event"
+        # Dynamic spatial zone based on normalized coordinates (0.0 to 1.0)
+        if avg_x < 0.35:
+            location = "left sector / entryway zone"
+            zone = "entry_sector"
+        elif avg_x > 0.65:
+            location = "right sector / walkway zone"
+            zone = "walkway_sector"
+        elif avg_y < 0.35:
+            location = "upper sector / background zone"
+            zone = "upper_sector"
+        elif avg_y > 0.65:
+            location = "foreground / camera perimeter zone"
+            zone = "foreground_sector"
         else:
-            if avg_x < 0.35 and avg_y < 0.55:
-                location = "entrance doorway and hallway"
-                zone = "entrance_doorway"
-            elif avg_x < 0.5 and avg_y >= 0.55:
-                location = "front office workstation desk"
-                zone = "front_desk"
-            elif avg_x >= 0.5 and avg_y < 0.55:
-                location = "side workstation area"
-                zone = "side_workstation"
-            else:
-                location = "central office workstation table"
-                zone = "central_workstation"
+            location = "central coverage zone"
+            zone = "central_sector"
 
-            # Determine behavior and activity from motion kinematics
-            if net_disp > 80:
-                if avg_x < 0.4:
-                    behavior = "walking into the room through the entrance doorway"
-                else:
-                    behavior = "moving across office workstation area"
-            elif net_disp < 40 and duration >= 3.0:
-                if "workstation" in location or "desk" in location:
-                    behavior = "seated at workstation desk working on laptop computer"
-                else:
-                    behavior = "standing near entrance area observing surroundings"
-            else:
-                if "desk" in location or "workstation" in location:
-                    behavior = "seated at desk interacting with computer workstation"
-                else:
-                    behavior = "present near entrance area"
+        # Dynamic behavioral classification based purely on physical motion vectors
+        if speed > 60.0 or net_disp > 120.0:
+            behavior = f"moving rapidly through {location} (velocity: {speed:.1f}px/s)"
+        elif speed > 20.0:
+            behavior = f"walking along {location}"
+        elif duration >= 4.0:
+            behavior = f"lingering/standing in {location} (duration: {duration:.1f}s)"
+        else:
+            behavior = f"present in {location}"
 
         # Safe string representations
         track_id_str = str(track_id or "unknown")
-        
-        # Gender & Demographic classification
-        is_female = (
-            track_id_str in self.KNOWN_FEMALE_TRACKS
-            or (canonical_pid and any(f in canonical_pid for f in self.KNOWN_FEMALE_TRACKS))
-        )
-        gender = "female" if is_female else "male"
 
-        # Find best crop path if available on disk — dynamically search actual video tracks
+        # Find best crop path if available on disk dynamically
         crop_path_relative = None
         crop_search_paths = []
         if video_id:
@@ -197,7 +161,6 @@ class AutoVideoMetadataExtractor:
                 num_part = track_id_str.replace("P", "")
                 if num_part.isdigit():
                     crop_search_paths.append(f"dataset/tracks/{video_id}/P{num_part.zfill(3)}/crops")
-        # Also scan all video track directories
         tracks_root = Path("dataset/tracks")
         if tracks_root.exists():
             for vid_dir in tracks_root.iterdir():
@@ -214,14 +177,12 @@ class AutoVideoMetadataExtractor:
                     crop_path_relative = f"/media/{jpgs[0].relative_to('dataset')}"
                     break
 
-        # Generate rich, human-readable forensic description
-        gender_title = "Female participant" if gender == "female" else "Male individual"
-        description = f"{gender_title} ({track_id}) {behavior} at {location}."
+        description = f"Individual ({track_id}) {behavior}."
 
         return {
             "track_id": track_id,
             "canonical_person_id": canonical_pid or f"P_{track_id}",
-            "gender": gender,
+            "gender": "individual",
             "behavior": behavior,
             "location": location,
             "spatial_zone": zone,
@@ -229,6 +190,7 @@ class AutoVideoMetadataExtractor:
             "end_time_sec": round(end_t, 2),
             "duration_sec": duration,
             "net_displacement_px": round(net_disp, 1),
+            "speed_px_per_sec": round(speed, 1),
             "crop_url": crop_path_relative,
             "description": description
         }

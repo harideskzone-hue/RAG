@@ -25,7 +25,7 @@ export function EvidencePanel({ selectedContract }: EvidencePanelProps) {
   const count = person_count ?? evidence?.length ?? 0;
   const zoneName = zone || 'Entrance (cam_auto_01)';
   const windowStr = evaluation_window || '00:00 - 01:50';
-  const mainClipUrl = scene_clip || (evidence && evidence.length > 0 ? evidence[0].clip_url : '/media/videos/completed/VIDEO-2026-08-11-12-15-36.mp4');
+  const mainClipUrl = scene_clip || (evidence && evidence.length > 0 ? evidence[0].clip_url : '');
 
   return (
     <div className="evidence-panel">
