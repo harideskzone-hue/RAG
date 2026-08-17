@@ -282,13 +282,14 @@ class AutoVideoMetadataExtractor:
                 clip_url = None
                 thumb_url = None
                 source_video_candidates = [
-                    Path("dataset/storage/vista-video-bucket/cctv.mp4"),
-                    Path("dataset/storage/vista-video-bucket") / video_id,
-                    Path("dataset/storage") / video_id,
                     Path("input/completed") / video_id,
                     Path("input/watch") / video_id,
                     Path("input/processing") / video_id,
-                    Path("input") / video_id
+                    Path("input") / video_id,
+                    Path("dataset/storage/vista-video-bucket") / video_id,
+                    Path("dataset/storage") / video_id,
+                    Path("input/completed") / (video_id if video_id.endswith(".mp4") else f"{video_id}.mp4"),
+                    Path(video_id)
                 ]
                 source_video_path = next((p for p in source_video_candidates if p.exists()), None)
                 if not source_video_path:
