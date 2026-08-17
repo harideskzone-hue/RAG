@@ -183,20 +183,15 @@ class ChatPresenter:
 
         def resolve_details_for_evidence(e):
             desc = e.get("description", "")
-            p_id = e.get("person_id") or e.get("track_id")
-            if not p_id:
-                for pattern in ["PERSON_", "P_"]:
-                    if pattern in desc:
-                        m = re.search(rf"({pattern}[A-Za-z0-9]+)", desc)
-                        if m:
-                            p_id = m.group(1)
-                            break
-
             meta = e.get("metadata") or {}
+            attr = e.get("attributes") or meta.get("attributes") or {}
             origin = meta.get("origin") or {}
-            attr = meta.get("attributes") or {}
+
+            p_id = e.get("person_id") or e.get("track_id") or meta.get("canonical_person_id") or meta.get("track_id") or attr.get("original_id") or origin.get("track_id")
             if not p_id:
-                p_id = meta.get("canonical_person_id") or attr.get("original_id") or origin.get("track_id")
+                m = re.search(r'\b(PERSON_[A-Za-z0-9]+|P_[A-Za-z0-9]+|P\d+|[A-Fa-f0-9]{8})\b', desc)
+                if m:
+                    p_id = m.group(1)
 
             # Enrich from metadata JSON index
             matched_meta = (
@@ -215,10 +210,16 @@ class ChatPresenter:
                     meta["role"] = matched_meta.get("role")
                 if not meta.get("behavior"):
                     meta["behavior"] = matched_meta.get("behavior")
+            if not meta.get("gender") and attr.get("gender"):
+                meta["gender"] = attr.get("gender")
+            if not meta.get("role") and attr.get("role"):
+                meta["role"] = attr.get("role")
+            if not meta.get("behavior") and attr.get("behavior"):
+                meta["behavior"] = attr.get("behavior")
 
-            crop_url = e.get("crop_url") or meta.get("crop_url")
-            timestamp = e.get("timestamp") or meta.get("video_timestamp_sec") or meta.get("timestamp")
-            clip_url = e.get("clip_url") or meta.get("clip_url")
+            crop_url = e.get("crop_url") or meta.get("crop_url") or attr.get("crop_url")
+            timestamp = e.get("timestamp") or meta.get("video_timestamp_sec") or meta.get("timestamp") or attr.get("timestamp")
+            clip_url = e.get("clip_url") or meta.get("clip_url") or attr.get("clip_url")
 
             if not crop_url and p_id:
                 crop_url = (
@@ -245,20 +246,23 @@ class ChatPresenter:
                     if input_videos:
                         clip_url = f"/media/videos/{input_videos[0].name}"
 
-            return p_id, crop_url, timestamp, clip_url
+            return p_id, crop_url, timestamp, clip_url, meta, desc
 
-        # Query Target Filtering (Strict Grounding: Do not return wrong or arbitrary persons)
-        # Determine query target filter with strict word boundaries
+        # Query Target & Attribute Filtering (Strict Grounding)
         q_lower = str(canonical_response.get("query", "")).lower()
+        is_greeting = bool(re.search(r'^(hi|hello|hey|greetings|good morning|good afternoon|good evening|howdy)\b', q_lower))
+        is_capability = bool(re.search(r'\b(what can you do|capabilities|capability|help|who are you|what are you)\b', q_lower))
         is_women_query = bool(re.search(r'\b(women|womens|woman|womans|female|females|lady|ladies|girl|girls)\b', q_lower))
         is_men_query = bool(re.search(r'\b(men|mens|man|mans|male|males|salesman|salesmen|gentleman|gentlemen|boy|boys|guy|guys)\b', q_lower)) and not is_women_query
         is_suspect_query = bool(re.search(r'\b(suspect|suspects|snatcher|snatchers|thief|thieves|robber|robbers|culprit|culprits|snatch)\b', q_lower))
         is_absent_target = bool(re.search(r'\b(child|children|kid|kids|baby|babies|vehicle|vehicles|car|cars|truck|trucks|weapon|weapons|gun|guns|knife|knives|animal|animals|dog|dogs|cat|cats)\b', q_lower))
 
-        # Build deduplicated evidence list (1 card per unique individual)
-        raw_evidence = canonical_response.get("evidence", []) if not is_absent_target else []
+        # Check for target clothing color query
+        color_match = re.search(r'\b(blue|red|green|black|white|yellow|orange|purple|pink|brown|gray|grey)\b(?:\s+(shirt|t-shirt|pant|pants|dress|jacket|hoodie|attire|clothes|clothing))?', q_lower)
+        target_color = color_match.group(1).lower() if color_match else None
+        target_apparel = color_match.group(2).lower() if color_match and color_match.group(2) else None
+
         seen_pids = set()
-        evidence = []
 
         def normalize_pid_key(pid: str, desc: str = "") -> str:
             if not pid:
@@ -275,9 +279,11 @@ class ChatPresenter:
                 return f"P{int(s):03d}"
             return s
 
+        evidence = []
+        raw_evidence = canonical_response.get("evidence", []) if not (is_absent_target or is_greeting or is_capability) else []
+
         for e in raw_evidence:
-            p_id, crop_url, raw_ts, clip_url = resolve_details_for_evidence(e)
-            desc_val = str(e.get("description") or "")
+            p_id, crop_url, raw_ts, clip_url, meta, desc_val = resolve_details_for_evidence(e)
             clean_pid = normalize_pid_key(p_id, desc_val)
             
             # Deduplicate by normalized person_id to prevent duplicate cards for the same person
@@ -287,8 +293,7 @@ class ChatPresenter:
                 seen_pids.add(clean_pid)
 
             # Strict Target Filtering dynamically from evidence metadata with word boundaries
-            meta = e.get("metadata") or {}
-            ev_desc = str(e.get("description") or meta.get("description") or "").lower()
+            ev_desc = str(desc_val or meta.get("description") or "").lower()
             ev_gender = str(meta.get("gender") or "").lower()
             ev_role = str(meta.get("role") or "").lower()
             
@@ -302,6 +307,12 @@ class ChatPresenter:
                 continue
             if is_men_query and not is_male:
                 continue
+
+            # Clothing / Color Attribute Matching
+            if target_color:
+                has_color = target_color in ev_desc or (meta.get("attributes") and target_color in str(meta.get("attributes")).lower())
+                if not has_color:
+                    continue
 
             # Discard non-human/false tracks with no valid crop
             if not crop_url:
@@ -370,67 +381,92 @@ class ChatPresenter:
         timeline = canonical_response.get("timeline", [])
         processing = canonical_response.get("processing", {})
 
-        if canonical_response.get("detection_status") in ("CRITICAL_ALERT", "INCIDENT_ALERT"):
+        if is_greeting or is_capability:
+            detection_status = "EMPTY"
+            person_count = 0
+            answer = canonical_response.get("final_answer") or canonical_response.get("content")
+        elif canonical_response.get("detection_status") in ("CRITICAL_ALERT", "INCIDENT_ALERT"):
             detection_status = canonical_response["detection_status"]
             person_count = max(1, len(evidence))
         elif is_absent_target or len(evidence) == 0:
             detection_status = "EMPTY"
             person_count = 0
-            if is_absent_target:
+            if target_color:
+                answer = f"I examined the CCTV footage for individuals wearing a **{target_color} {target_apparel or 'shirt'}**.\n\nBased on visual analysis across all detected tracks, **no individual wearing {target_color} attire was detected** in the scene."
+            elif is_absent_target:
                 answer = "I analyzed the CCTV footage. No matching individuals, children, or vehicles were detected in the area."
+            elif is_suspect_query:
+                answer = "I analyzed the CCTV footage. No suspect or chain snatcher was verified in the camera coverage."
+            elif is_men_query:
+                answer = "I analyzed the CCTV footage. No male individuals were verified in the camera coverage."
+            elif is_women_query:
+                answer = "I analyzed the CCTV footage. No female individuals were verified in the camera coverage."
+            else:
+                answer = "I analyzed the CCTV footage. No persons matching your search criteria were detected in the camera coverage."
         else:
             detection_status = "DETECTED"
             status = "SUCCESS"
             person_count = len(evidence)
 
         zone = canonical_response.get("zone", "Entrance (cam_auto_01)")
-        evaluation_window = canonical_response.get("evaluation_window", "00:00 - 01:50")
+        evaluation_window = canonical_response.get("evaluation_window", "00:00 - 00:10 (10s Incident Clip)")
         scene_clip = canonical_response.get("scene_clip")
         scene_thumbnail = canonical_response.get("scene_thumbnail")
 
         if not scene_clip:
-            completed_videos = list(Path("input/completed").glob("*.mp4"))
-            if completed_videos:
-                scene_clip = f"/media/videos/completed/{completed_videos[0].name}"
+            event_clips = sorted(list(Path("dataset/events").glob("**/clip.mp4")), key=lambda f: f.stat().st_mtime, reverse=True)
+            if event_clips:
+                scene_clip = f"/media/{event_clips[0].relative_to('dataset')}"
             else:
-                input_videos = list(Path("input").glob("*.mp4"))
-                if input_videos:
-                    scene_clip = f"/media/videos/{input_videos[0].name}"
+                completed_videos = list(Path("input/completed").glob("*.mp4"))
+                if completed_videos:
+                    scene_clip = f"/media/videos/completed/{completed_videos[0].name}"
+                else:
+                    input_videos = list(Path("input").glob("*.mp4"))
+                    if input_videos:
+                        scene_clip = f"/media/videos/{input_videos[0].name}"
 
         if not scene_thumbnail and evidence:
             scene_thumbnail = evidence[0].crop_url
 
-        # Format answer count to clearly specify unique individuals vs observation instances
-        if is_suspect_query:
-            if person_count == 0:
-                answer = "I analyzed the CCTV footage. No suspect or chain snatcher was verified in the camera coverage."
+        # Format answer count to clearly specify unique individuals vs observation instances (Claude Style)
+        if not (is_greeting or is_capability or len(evidence) == 0):
+            if is_suspect_query:
+                answer = (
+                    f"Based on forensic analysis of the CCTV footage, I identified the primary suspect as **Person {evidence[0].person_id}**.\n\n"
+                    f"• **Behavior**: {evidence[0].description.split('{')[0].strip()}\n"
+                    f"• **Keyframe Evidence**: Keyframe crop and the sliced 10-second forensic incident clip are loaded in the Evidence Panel on the right."
+                )
+            elif target_color:
+                answer = (
+                    f"I analyzed the CCTV footage and located **{person_count} individual(s)** wearing a **{target_color} {target_apparel or 'shirt'}**:\n\n"
+                    + "\n".join([f"• **Person {e.person_id}**: {e.description.split('{')[0].strip()}" for e in evidence])
+                )
+            elif is_men_query:
+                answer = (
+                    f"I analyzed the CCTV footage and identified **{person_count} male individual(s)**:\n\n"
+                    + "\n".join([f"• **Person {e.person_id}**: {e.description.split('{')[0].strip()}" for e in evidence])
+                )
+            elif is_women_query:
+                answer = (
+                    f"I analyzed the CCTV footage and identified **{person_count} female individual(s)**:\n\n"
+                    + "\n".join([f"• **Person {e.person_id}**: {e.description.split('{')[0].strip()}" for e in evidence])
+                )
             else:
-                answer = f"Based on the CCTV footage, I identified the chain snatcher/suspect as Person {evidence[0].person_id}. {evidence[0].description}"
-        elif is_men_query:
-            if person_count == 0:
-                answer = "I analyzed the CCTV footage. No male individuals were verified in the camera coverage."
-            else:
-                answer = f"I analyzed the CCTV footage and identified {person_count} male individual(s):\n" + "\n".join([f"- Person {e.person_id}: {e.description.split('{')[0].strip()}" for e in evidence])
-        elif is_women_query:
-            if person_count == 0:
-                answer = "I analyzed the CCTV footage. No female individuals were verified in the camera coverage."
-            else:
-                answer = f"I analyzed the CCTV footage and identified {person_count} female individual(s):\n" + "\n".join([f"- Person {e.person_id}: {e.description.split('{')[0].strip()}" for e in evidence])
-        else:
-            # General person/people query (returns all individuals with dynamic breakdown)
-            men_found = sum(1 for e in evidence if "male" in str(getattr(e, "description", "")).lower() and "female" not in str(getattr(e, "description", "")).lower())
-            women_found = sum(1 for e in evidence if "female" in str(getattr(e, "description", "")).lower())
-            breakdown_parts = []
-            if men_found:
-                breakdown_parts.append(f"{men_found} male")
-            if women_found:
-                breakdown_parts.append(f"{women_found} female")
-            breakdown_str = f" ({', '.join(breakdown_parts)})" if breakdown_parts else ""
-            
-            if person_count == 0:
-                answer = "I analyzed the CCTV footage. No persons were detected in the camera coverage."
-            else:
-                answer = f"I analyzed the CCTV footage and identified {person_count} unique individual(s){breakdown_str}:\n" + "\n".join([f"- Person {e.person_id}: {e.description.split('{')[0].strip()}" for e in evidence])
+                # General person/people query (returns all individuals with dynamic breakdown)
+                men_found = sum(1 for e in evidence if "male" in str(getattr(e, "description", "")).lower() and "female" not in str(getattr(e, "description", "")).lower())
+                women_found = sum(1 for e in evidence if "female" in str(getattr(e, "description", "")).lower())
+                breakdown_parts = []
+                if men_found:
+                    breakdown_parts.append(f"{men_found} male")
+                if women_found:
+                    breakdown_parts.append(f"{women_found} female")
+                breakdown_str = f" ({', '.join(breakdown_parts)})" if breakdown_parts else ""
+                
+                answer = (
+                    f"I analyzed the CCTV footage and identified **{person_count} unique individual(s)**{breakdown_str}:\n\n"
+                    + "\n".join([f"• **Person {e.person_id}**: {e.description.split('{')[0].strip()}" for e in evidence])
+                )
 
         return ChatResponse(
             status=status,

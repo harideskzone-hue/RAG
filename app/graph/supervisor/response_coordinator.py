@@ -110,7 +110,67 @@ class ResponseCoordinator:
         domain = getattr(query_intent, "domain", "investigation")
         operation = getattr(query_intent, "operation", "")
         raw_query = str(getattr(context, "current_query", "") or "").strip().lower()
-        is_general_query = (domain == "general" or operation in ("greeting", "capability_explanation") or raw_query in ("hi", "hello", "hey", "start", "status"))
+        is_greeting = bool(re.search(r'^(hi|hello|hey|greetings|good morning|good afternoon|good evening|howdy)\b', raw_query))
+        is_capability = bool(re.search(r'\b(what can you do|capabilities|capability|help|who are you|what are you)\b', raw_query))
+
+        if is_greeting:
+            greeting_answer = (
+                "Hello! I am VISTA AI, your multi-modal forensic video intelligence assistant.\n\n"
+                "I am ready to help you analyze the surveillance footage. Here are some of the things you can ask me:\n"
+                "• **Overview & Counting**: *\"How many people are in the footage?\"* or *\"How many men/women are present?\"*\n"
+                "• **Suspect & Incident Analysis**: *\"Who is the chain snatcher?\"* or *\"What happened in the video?\"*\n"
+                "• **Visual & Attribute Search**: *\"Show me the person behind the counter\"* or *\"Find individuals at the entrance.\"*\n\n"
+                "How would you like to proceed with the analysis?"
+            )
+            return {
+                "status": "success",
+                "query": getattr(context, "current_query", ""),
+                "error": None,
+                "detection_status": "EMPTY",
+                "person_count": 0,
+                "zone": "Surveillance Coverage (cam_auto_01)",
+                "evaluation_window": "Live Active Session",
+                "final_answer": greeting_answer,
+                "content": greeting_answer,
+                "thought": "Greeting intent detected. Providing Claude-style forensic assistant introduction.",
+                "thinking_process": "Greeting intent detected. Providing Claude-style forensic assistant introduction.",
+                "evidence": [],
+                "citations": [],
+                "overall_confidence": 1.0,
+                "agent_decisions": context.agent_decisions,
+                "execution": {"status": "completed", "steps": exec_steps}
+            }
+
+        if is_capability:
+            cap_answer = (
+                "I am **VISTA AI**, an autonomous agentic forensic surveillance intelligence platform.\n\n"
+                "### Core Capabilities:\n"
+                "1. **Autonomous Multi-Person Tracking**: Continuous trajectory tracking and kinematic displacement analysis.\n"
+                "2. **Invariant Visual Re-ID**: Deep 512-D OSNet embeddings for consistent identity resolution across camera feeds.\n"
+                "3. **Vision-Language Incident Reasoning**: Automated detection of theft, chain snatching, and suspicious behaviors.\n"
+                "4. **Forensic Evidence Delivery**: High-resolution face/body keyframe crops and sliced H.264 incident video clips.\n\n"
+                "Feel free to ask any question regarding individuals, movements, or security incidents in the footage."
+            )
+            return {
+                "status": "success",
+                "query": getattr(context, "current_query", ""),
+                "error": None,
+                "detection_status": "EMPTY",
+                "person_count": 0,
+                "zone": "Surveillance Coverage (cam_auto_01)",
+                "evaluation_window": "Live Active Session",
+                "final_answer": cap_answer,
+                "content": cap_answer,
+                "thought": "Capability inquiry detected. Presenting forensic system overview.",
+                "thinking_process": "Capability inquiry detected. Presenting forensic system overview.",
+                "evidence": [],
+                "citations": [],
+                "overall_confidence": 1.0,
+                "agent_decisions": context.agent_decisions,
+                "execution": {"status": "completed", "steps": exec_steps}
+            }
+
+        is_general_query = (domain == "general" or operation in ("greeting", "capability_explanation") or raw_query in ("start", "status"))
 
         # Check for active security incident events in metadata
         active_incident = None
@@ -134,69 +194,6 @@ class ResponseCoordinator:
         except Exception:
             pass
 
-        if is_general_query:
-            if active_incident:
-                # Proactively alert user of detected crime incident with 10s clip
-                inc_title = active_incident.get("title", "🚨 CRITICAL SECURITY INCIDENT DETECTED")
-                inc_desc = active_incident.get("description", "A chain snatching / robbery incident was detected.")
-                start_t = float(active_incident.get("start_time_sec", 0.0))
-                end_t = float(active_incident.get("end_time_sec", start_t + 10.0))
-                window_str = f"{int(start_t // 60):02d}:{int(start_t % 60):02d} - {int(end_t // 60):02d}:{int(end_t % 60):02d}"
-                clip_url = active_incident.get("clip_url", f"/media/events/{active_incident.get('event_id', 'incident')}/clip.mp4")
-                suspect_id = active_incident.get("suspect_track_id", "P001")
-
-                alert_answer = (
-                    f"⚠️ **{inc_title}**\n\n"
-                    f"I have detected a **Chain Snatching / Robbery Incident** in the surveillance footage:\n\n"
-                    f"• **Incident Type**: Chain Snatching / Robbery\n"
-                    f"• **Critical Window**: **{window_str}** (Exact 10-Second Event Video Clip)\n"
-                    f"• **Suspect Identified**: Track **{suspect_id}** approaching victim, grabbing chain, and fleeing.\n"
-                    f"• **Authoritative Evidence**: The 10-second forensic incident clip is ready to play in the Evidence Panel on the right.\n\n"
-                    f"You can ask me to analyze the suspect, trace escape paths, or generate a full forensic report."
-                )
-
-                return {
-                    "status": "success",
-                    "error": None,
-                    "detection_status": "CRITICAL_ALERT",
-                    "person_count": 1,
-                    "zone": f"Entrance ({active_incident.get('camera_id', 'cam_auto_01')})",
-                    "evaluation_window": f"{window_str} (10s Incident Clip)",
-                    "scene_clip": clip_url,
-                    "scene_thumbnail": active_incident.get("thumbnail_url"),
-                    "final_answer": alert_answer,
-                    "content": alert_answer,
-                    "thought": "Proactive Security Incident Trigger: Detected chain snatching / robbery event in CCTV metadata and loaded 10s video clip.",
-                    "thinking_process": "Proactive Security Incident Trigger: Detected chain snatching / robbery event in CCTV metadata and loaded 10s video clip.",
-                    "evidence": [],
-                    "citations": [cit.model_dump() for cit in context.citations],
-                    "overall_confidence": 0.99,
-                    "agent_decisions": context.agent_decisions,
-                    "execution": {"status": "completed", "steps": exec_steps}
-                }
-
-            elif "reasoning_agent" in context.results:
-                rr = context.results["reasoning_agent"]
-                answer = getattr(rr, "answer", None) or getattr(rr, "explanation", None)
-                if not answer and hasattr(rr, "metadata") and isinstance(rr.metadata, dict):
-                    answer = rr.metadata.get("answer") or rr.metadata.get("explanation")
-                thought_text = rr.metadata.get("thought") or rr.metadata.get("thinking_process") if hasattr(rr, "metadata") else None
-                if answer:
-                    return {
-                        "status": "success",
-                        "error": None,
-                        "detection_status": "EMPTY",
-                        "person_count": 0,
-                        "final_answer": answer,
-                        "content": answer,
-                        "thought": thought_text,
-                        "thinking_process": thought_text,
-                        "evidence": [],
-                        "citations": [cit.model_dump() for cit in context.citations],
-                        "overall_confidence": context.confidence_score or 1.0,
-                        "agent_decisions": context.agent_decisions,
-                        "execution": {"status": "completed", "steps": exec_steps}
-                    }
 
         # -------------------------------------------------------------
         # Conversational / System Agent Overrides
@@ -229,7 +226,9 @@ class ResponseCoordinator:
         # ResponseCoordinator must NEVER recalculate verified_count or constraints.
         # The VerificationAgent is the sole source of truth for the VerifiedResultContract.
         raw_contract = context.results.get("verified_contract")
-        if hasattr(raw_contract, "__dict__"):
+        if hasattr(raw_contract, "model_dump"):
+            vc_dict = raw_contract.model_dump()
+        elif hasattr(raw_contract, "__dict__"):
             vc_dict = raw_contract.__dict__
         else:
             vc_dict = raw_contract or {}
@@ -281,7 +280,10 @@ class ResponseCoordinator:
                 for claim in claims:
                     if isinstance(claim, dict):
                         cited_eids.update([str(e) for e in claim.get("evidence_ids", [])])
-                formatted_evidence = [e for e in formatted_evidence if str(e.get("evidence_id")) in cited_eids]
+                if cited_eids:
+                    filtered_ev = [e for e in formatted_evidence if str(e.get("evidence_id")) in cited_eids]
+                    if filtered_ev:
+                        formatted_evidence = filtered_ev
 
         # Response Generation: 100% LLM Thinking & Synthesis
         reasoning_ans = None

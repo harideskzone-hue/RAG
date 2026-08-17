@@ -1,6 +1,7 @@
 import json
 from typing import Any
 
+from app.agents.intent.enums import Intent
 from app.agents.intent.schemas import IntentResult
 from app.agents.planner.prompts import PLANNER_SYSTEM_PROMPT, PLANNER_USER_PROMPT
 from app.schemas.context import ExecutionPlan, ToolRequirement
@@ -16,6 +17,9 @@ class ExecutionPlanner:
         self.llm = llm_client
 
     async def plan(self, intent_result: IntentResult, query: str = "", execution_mode: ExecutionMode = ExecutionMode.ITERATIVE) -> ExecutionPlan | None:
+        if intent_result.intent in (Intent.GREETING, Intent.CAPABILITY_EXPLANATION) or getattr(intent_result, 'domain', '') == 'general':
+            return self._deterministic_fallback_plan(intent_result)
+
         # If LLM is not available or intent is highly confident, use deterministic fallback
         conf_val = getattr(intent_result.confidence, 'overall', intent_result.confidence) if hasattr(intent_result, 'confidence') else 0.0
         plan_obj = None
