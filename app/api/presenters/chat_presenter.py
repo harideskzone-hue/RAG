@@ -149,7 +149,23 @@ class ChatPresenter:
                     except Exception:
                         pass
 
-        # 3. Scan MongoDB observations for cross-reference
+        # 3. Scan dataset/metadata for rich descriptions, roles, and demographics
+        pid_to_meta = {}
+        for meta_file in Path("dataset/metadata").glob("*.json"):
+            try:
+                with open(meta_file) as mf:
+                    m_data = json.load(mf)
+                for t in m_data.get("tracks", []):
+                    tid = t.get("track_id")
+                    cpid = t.get("canonical_person_id")
+                    if tid:
+                        pid_to_meta[tid] = t
+                    if cpid:
+                        pid_to_meta[cpid] = t
+            except Exception:
+                pass
+
+        # 4. Scan MongoDB observations for cross-reference
         try:
             mc = MongoClient(db_settings.MONGO_URI, serverSelectionTimeoutMS=1000)
             db = mc[db_settings.MONGO_DB_NAME]
@@ -181,6 +197,19 @@ class ChatPresenter:
             attr = meta.get("attributes") or {}
             if not p_id:
                 p_id = meta.get("canonical_person_id") or attr.get("original_id") or origin.get("track_id")
+
+            # Enrich from metadata JSON index
+            if p_id and (str(p_id) in pid_to_meta or str(p_id).replace("PERSON_", "P_") in pid_to_meta):
+                matched_meta = pid_to_meta.get(str(p_id)) or pid_to_meta.get(str(p_id).replace("PERSON_", "P_"))
+                if matched_meta:
+                    if not desc or "observed on camera" in desc:
+                        desc = matched_meta.get("description", desc)
+                    if not meta.get("gender"):
+                        meta["gender"] = matched_meta.get("gender")
+                    if not meta.get("role"):
+                        meta["role"] = matched_meta.get("role")
+                    if not meta.get("behavior"):
+                        meta["behavior"] = matched_meta.get("behavior")
 
             crop_url = e.get("crop_url") or meta.get("crop_url")
             timestamp = e.get("timestamp") or meta.get("video_timestamp_sec") or meta.get("timestamp")
@@ -215,6 +244,7 @@ class ChatPresenter:
         q_lower = str(canonical_response.get("query", "")).lower()
         is_women_query = any(w in q_lower for w in ["women", "woman", "female", "lady", "girl"])
         is_men_query = any(w in q_lower for w in [" men", " man", "male", "gentleman", "boy", "guys"]) and not is_women_query
+        is_suspect_query = any(w in q_lower for w in ["suspect", "snatcher", "thief", "robber", "culprit", "snatch"])
         is_absent_target = any(w in q_lower for w in ["child", "kid", "baby", "vehicle", "car", "truck", "weapon", "gun", "knife", "animal", "dog", "cat"])
 
         # Build deduplicated evidence list (1 card per unique individual)
@@ -236,8 +266,12 @@ class ChatPresenter:
             meta = e.get("metadata") or {}
             ev_desc = str(e.get("description") or meta.get("description") or "").lower()
             ev_gender = str(meta.get("gender") or "").lower()
+            ev_role = str(meta.get("role") or "").lower()
             is_female = ev_gender == "female" or "female" in ev_desc or "woman" in ev_desc
+            is_suspect = ev_role == "suspect" or "suspect" in ev_desc or "snatch" in ev_desc or "flee" in ev_desc
 
+            if is_suspect_query and not is_suspect:
+                continue
             if is_women_query and not is_female:
                 continue
             if is_men_query and is_female:
@@ -340,9 +374,25 @@ class ChatPresenter:
             scene_thumbnail = evidence[0].crop_url
 
         # Format answer count to clearly specify unique individuals vs observation instances
-        if answer and ("30 verified individuals" in answer or "30 people" in answer):
-            answer = answer.replace("30 verified individuals", f"{person_count} unique individuals (from 30 observations)")
-            answer = answer.replace("30 people", f"{person_count} unique individuals (from 30 observations)")
+        if is_suspect_query:
+            if person_count == 0:
+                answer = "I analyzed the CCTV footage. No suspect or chain snatcher was verified in the camera coverage."
+            else:
+                answer = f"Based on the CCTV footage, I identified the chain snatcher/suspect as Person {evidence[0].person_id}. {evidence[0].description}"
+        elif is_men_query:
+            if person_count == 0:
+                answer = "I analyzed the CCTV footage. No male individuals were verified in the camera coverage."
+            else:
+                answer = f"I analyzed the CCTV footage and identified {person_count} male individual(s):\n" + "\n".join([f"- Person {e.person_id}: {e.description.split('{')[0].strip()}" for e in evidence])
+        elif is_women_query:
+            if person_count == 0:
+                answer = "I analyzed the CCTV footage. No female individuals were verified in the camera coverage."
+            else:
+                answer = f"I analyzed the CCTV footage and identified {person_count} female individual(s):\n" + "\n".join([f"- Person {e.person_id}: {e.description.split('{')[0].strip()}" for e in evidence])
+        elif answer and ("verified individuals" in answer or "people" in answer):
+            import re
+            answer = re.sub(r'\b\d+\s+verified individuals\b', f"{person_count} unique individuals", answer)
+            answer = re.sub(r'\b\d+\s+people\b', f"{person_count} people", answer)
 
         return ChatResponse(
             status=status,

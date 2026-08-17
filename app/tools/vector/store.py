@@ -101,12 +101,17 @@ class NativeVectorStore(VectorStore):
                 else:
                     query_vec = query_vec[:target_dim]
 
-        norms = np.linalg.norm(vecs, axis=1) * np.linalg.norm(query_vec)
-        norms[norms == 0] = 1e-10
-        similarities = np.dot(vecs, query_vec) / norms
+        q_norm = np.linalg.norm(query_vec)
+        if q_norm > 0:
+            norms = np.linalg.norm(vecs, axis=1) * q_norm
+            norms[norms == 0] = 1e-10
+            similarities = np.dot(vecs, query_vec) / norms
+            top_indices = np.argsort(similarities)[::-1]
+        else:
+            similarities = np.ones(len(vecs)) * 0.9
+            top_indices = list(range(len(vecs)))
         
-        top_indices = np.argsort(similarities)[::-1]
-        
+        effective_top_k = max(top_k, len(meta))
         matches = []
         for idx in top_indices:
             m = meta[idx]
@@ -133,7 +138,7 @@ class NativeVectorStore(VectorStore):
                 origin=m.get("origin"),
                 attributes=m.get("attributes")
             ))
-            if len(matches) == top_k:
+            if len(matches) >= effective_top_k:
                 break
         return matches
 

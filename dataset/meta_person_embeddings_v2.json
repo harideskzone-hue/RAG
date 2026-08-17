@@ -1,1 +1,288 @@
-[{"id": "PERSON_BA108CC1", "camera_id": "cam_auto_01", "timestamp": "0.0", "description": "", "bbox": null}, {"id": "PERSON_1F1A630E", "camera_id": "cam_auto_01", "timestamp": "0.5333333333333333", "description": "", "bbox": null}, {"id": "PERSON_A18BA11C", "camera_id": "cam_auto_01", "timestamp": "0.5", "description": "", "bbox": null}, {"id": "PERSON_C0E563AF", "camera_id": "cam_auto_01", "timestamp": "0.0", "description": "", "bbox": null}, {"id": "PERSON_966338D8", "camera_id": "cam_auto_01", "timestamp": "1.4666666666666666", "description": "", "bbox": null}, {"id": "PERSON_FAD2E393", "camera_id": "cam_auto_01", "timestamp": "3.8", "description": "", "bbox": null}, {"id": "PERSON_34655BE1", "camera_id": "cam_auto_01", "timestamp": "2.0", "description": "", "bbox": null}, {"id": "PERSON_A18BA11C", "camera_id": "cam_auto_01", "timestamp": "2.4", "description": "", "bbox": null}, {"id": "PERSON_5E4DC4CC", "camera_id": "cam_auto_01", "timestamp": "5.066666666666666", "description": "", "bbox": null}, {"id": "PERSON_966338D8", "camera_id": "cam_auto_01", "timestamp": "5.433333333333334", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "6.866666666666666", "description": "", "bbox": null}, {"id": "PERSON_A939D9CC", "camera_id": "cam_auto_01", "timestamp": "6.866666666666666", "description": "", "bbox": null}, {"id": "PERSON_742CA419", "camera_id": "cam_auto_01", "timestamp": "8.7", "description": "", "bbox": null}, {"id": "PERSON_20EF2E66", "camera_id": "cam_auto_01", "timestamp": "32.9", "description": "", "bbox": null}, {"id": "PERSON_87693337", "camera_id": "cam_auto_01", "timestamp": "11.066666666666666", "description": "", "bbox": null}, {"id": "PERSON_8431D375", "camera_id": "cam_auto_01", "timestamp": "11.5", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "16.3", "description": "", "bbox": null}, {"id": "PERSON_2B6C43DD", "camera_id": "cam_auto_01", "timestamp": "14.033333333333333", "description": "", "bbox": null}, {"id": "PERSON_405D87B9", "camera_id": "cam_auto_01", "timestamp": "15.833333333333334", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "40.03333333333333", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "18.833333333333332", "description": "", "bbox": null}, {"id": "PERSON_02B144D9", "camera_id": "cam_auto_01", "timestamp": "25.7", "description": "", "bbox": null}, {"id": "PERSON_2D13CCF9", "camera_id": "cam_auto_01", "timestamp": "24.366666666666667", "description": "", "bbox": null}, {"id": "PERSON_966338D8", "camera_id": "cam_auto_01", "timestamp": "25.333333333333332", "description": "", "bbox": null}, {"id": "PERSON_6AD565DD", "camera_id": "cam_auto_01", "timestamp": "41.63333333333333", "description": "", "bbox": null}, {"id": "PERSON_966338D8", "camera_id": "cam_auto_01", "timestamp": "30.366666666666667", "description": "", "bbox": null}, {"id": "PERSON_966338D8", "camera_id": "cam_auto_01", "timestamp": "32.43333333333333", "description": "", "bbox": null}, {"id": "PERSON_DEDE7E79", "camera_id": "cam_auto_01", "timestamp": "43.06666666666667", "description": "", "bbox": null}, {"id": "PERSON_98CC8FF0", "camera_id": "cam_auto_01", "timestamp": "40.8", "description": "", "bbox": null}, {"id": "PERSON_201B5C41", "camera_id": "cam_auto_01", "timestamp": "43.56666666666667", "description": "", "bbox": null}, {"id": "PERSON_AB155C9A", "camera_id": "cam_auto_01", "timestamp": "45.56666666666667", "description": "", "bbox": null}, {"id": "PERSON_E81FCAC3", "camera_id": "cam_auto_01", "timestamp": "46.266666666666666", "description": "", "bbox": null}, {"id": "PERSON_22577370", "camera_id": "cam_auto_01", "timestamp": "46.63333333333333", "description": "", "bbox": null}, {"id": "PERSON_DEDE7E79", "camera_id": "cam_auto_01", "timestamp": "48.56666666666667", "description": "", "bbox": null}, {"id": "PERSON_58501444", "camera_id": "cam_auto_01", "timestamp": "51.766666666666666", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "59.266666666666666", "description": "", "bbox": null}, {"id": "PERSON_9499EE98", "camera_id": "cam_auto_01", "timestamp": "53.43333333333333", "description": "", "bbox": null}, {"id": "PERSON_E91069F6", "camera_id": "cam_auto_01", "timestamp": "55.53333333333333", "description": "", "bbox": null}, {"id": "PERSON_9B347249", "camera_id": "cam_auto_01", "timestamp": "56.5", "description": "", "bbox": null}, {"id": "PERSON_17962639", "camera_id": "cam_auto_01", "timestamp": "60.0", "description": "", "bbox": null}, {"id": "PERSON_7ADDBC8F", "camera_id": "cam_auto_01", "timestamp": "59.833333333333336", "description": "", "bbox": null}, {"id": "PERSON_17962639", "camera_id": "cam_auto_01", "timestamp": "62.9", "description": "", "bbox": null}, {"id": "PERSON_17962639", "camera_id": "cam_auto_01", "timestamp": "67.76666666666667", "description": "", "bbox": null}, {"id": "PERSON_A157246A", "camera_id": "cam_auto_01", "timestamp": "73.7", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "69.23333333333333", "description": "", "bbox": null}, {"id": "PERSON_171B9E6B", "camera_id": "cam_auto_01", "timestamp": "71.7", "description": "", "bbox": null}, {"id": "PERSON_DFBBA7A7", "camera_id": "cam_auto_01", "timestamp": "75.16666666666667", "description": "", "bbox": null}, {"id": "PERSON_BA5268E6", "camera_id": "cam_auto_01", "timestamp": "74.96666666666667", "description": "", "bbox": null}, {"id": "PERSON_07D2215B", "camera_id": "cam_auto_01", "timestamp": "81.53333333333333", "description": "", "bbox": null}, {"id": "PERSON_A18BA11C", "camera_id": "cam_auto_01", "timestamp": "79.7", "description": "", "bbox": null}, {"id": "PERSON_A18BA11C", "camera_id": "cam_auto_01", "timestamp": "85.56666666666666", "description": "", "bbox": null}, {"id": "PERSON_FD14E3BE", "camera_id": "cam_auto_01", "timestamp": "81.03333333333333", "description": "", "bbox": null}, {"id": "PERSON_B933C1AF", "camera_id": "cam_auto_01", "timestamp": "81.66666666666667", "description": "", "bbox": null}, {"id": "PERSON_920C8BDB", "camera_id": "cam_auto_01", "timestamp": "88.53333333333333", "description": "", "bbox": null}, {"id": "PERSON_AF4CBA33", "camera_id": "cam_auto_01", "timestamp": "88.43333333333334", "description": "", "bbox": null}, {"id": "PERSON_966338D8", "camera_id": "cam_auto_01", "timestamp": "89.53333333333333", "description": "", "bbox": null}, {"id": "PERSON_966338D8", "camera_id": "cam_auto_01", "timestamp": "91.26666666666667", "description": "", "bbox": null}, {"id": "PERSON_C423550E", "camera_id": "cam_auto_01", "timestamp": "96.63333333333334", "description": "", "bbox": null}, {"id": "PERSON_5F9BE1CC", "camera_id": "cam_auto_01", "timestamp": "94.16666666666667", "description": "", "bbox": null}, {"id": "PERSON_31166B9D", "camera_id": "cam_auto_01", "timestamp": "94.33333333333333", "description": "", "bbox": null}, {"id": "PERSON_F4D1512B", "camera_id": "cam_auto_01", "timestamp": "98.86666666666666", "description": "", "bbox": null}, {"id": "PERSON_B493B2A2", "camera_id": "cam_auto_01", "timestamp": "97.0", "description": "", "bbox": null}, {"id": "PERSON_F7420EF1", "camera_id": "cam_auto_01", "timestamp": "98.3", "description": "", "bbox": null}, {"id": "PERSON_09516936", "camera_id": "cam_auto_01", "timestamp": "105.26666666666667", "description": "", "bbox": null}, {"id": "PERSON_31829C74", "camera_id": "cam_auto_01", "timestamp": "106.56666666666666", "description": "", "bbox": null}, {"id": "PERSON_67E95CE7", "camera_id": "cam_auto_01", "timestamp": "106.2", "description": "", "bbox": null}, {"id": "PERSON_31829C74", "camera_id": "cam_auto_01", "timestamp": "114.73333333333333", "description": "", "bbox": null}, {"id": "PERSON_03174454", "camera_id": "cam_auto_01", "timestamp": "115.4", "description": "", "bbox": null}, {"id": "PERSON_48145762", "camera_id": "cam_auto_01", "timestamp": "116.0", "description": "", "bbox": null}, {"id": "PERSON_498EA55B", "camera_id": "cam_auto_01", "timestamp": "119.33333333333333", "description": "", "bbox": null}, {"id": "PERSON_A546D930", "camera_id": "cam_auto_01", "timestamp": "119.4", "description": "", "bbox": null}, {"id": "PERSON_F4606F61", "camera_id": "cam_auto_01", "timestamp": "119.66666666666667", "description": "", "bbox": null}, {"id": "PERSON_3CF4CB6A", "camera_id": "cam_auto_01", "timestamp": "120.03333333333333", "description": "", "bbox": null}, {"id": "PERSON_E2E2EA2B", "camera_id": "cam_auto_01", "timestamp": "120.93333333333334", "description": "", "bbox": null}, {"id": "PERSON_E91069F6", "camera_id": "cam_auto_01", "timestamp": "0.0", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "12.39247572815534", "description": "", "bbox": null}, {"id": "PERSON_0BFC81D1", "camera_id": "cam_auto_01", "timestamp": "0.5663228155339806", "description": "", "bbox": null}, {"id": "PERSON_E2C1593A", "camera_id": "cam_auto_01", "timestamp": "0.09993932038834952", "description": "", "bbox": null}, {"id": "PERSON_17962639", "camera_id": "cam_auto_01", "timestamp": "1.6989684466019417", "description": "", "bbox": null}, {"id": "PERSON_7ADDBC8F", "camera_id": "cam_auto_01", "timestamp": "0.9993932038834952", "description": "", "bbox": null}, {"id": "PERSON_7ADDBC8F", "camera_id": "cam_auto_01", "timestamp": "2.698361650485437", "description": "", "bbox": null}, {"id": "PERSON_17962639", "camera_id": "cam_auto_01", "timestamp": "5.696541262135923", "description": "", "bbox": null}, {"id": "PERSON_17962639", "camera_id": "cam_auto_01", "timestamp": "8.594781553398057", "description": "", "bbox": null}, {"id": "PERSON_A157246A", "camera_id": "cam_auto_01", "timestamp": "12.658980582524272", "description": "", "bbox": null}, {"id": "PERSON_17962639", "camera_id": "cam_auto_01", "timestamp": "11.959405339805825", "description": "", "bbox": null}, {"id": "PERSON_00E7D5B5", "camera_id": "cam_auto_01", "timestamp": "12.459101941747573", "description": "", "bbox": null}, {"id": "PERSON_27B18366", "camera_id": "cam_auto_01", "timestamp": "13.62506067961165", "description": "", "bbox": null}]
+[
+  {
+    "id": "P_P001",
+    "track_id": "P001",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.0",
+    "description": "Individual (P001) store staff/salesman standing behind display counter managing jewelry trays.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P001/crops/obs_95194ea7.jpg",
+    "attributes": {
+      "gender": "male",
+      "role": "salesman",
+      "behavior": "store staff/salesman standing behind display counter managing jewelry trays",
+      "location": "behind jewelry display counter",
+      "spatial_zone": "sales_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P001/crops/obs_95194ea7.jpg"
+    }
+  },
+  {
+    "id": "P_P002",
+    "track_id": "P002",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.0",
+    "description": "Individual (P002) female customer standing at counter viewing jewelry / on mobile phone (duration: 13.7s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P002/crops/obs_dc7326a1.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 13.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P002/crops/obs_dc7326a1.jpg"
+    }
+  },
+  {
+    "id": "P_P003",
+    "track_id": "P003",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.0",
+    "description": "Individual (P003) female customer standing at counter viewing jewelry / on mobile phone (duration: 13.5s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P003/crops/obs_a3cff28a.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 13.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P003/crops/obs_a3cff28a.jpg"
+    }
+  },
+  {
+    "id": "P_P004",
+    "track_id": "P004",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.1",
+    "description": "Individual (P004) standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 292.4px, departed at 10.8s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P004/crops/obs_4a61fb36.jpg",
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 292.4px, departed at 10.8s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P004/crops/obs_4a61fb36.jpg"
+    }
+  },
+  {
+    "id": "P_P005",
+    "track_id": "P005",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.13",
+    "description": "Individual (P005) present in store area (duration: 3.0s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P005/crops/obs_aa670cb3.jpg",
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 3.0s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P005/crops/obs_aa670cb3.jpg"
+    }
+  },
+  {
+    "id": "P_P006",
+    "track_id": "P006",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.47",
+    "description": "Individual (P006) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P006/crops/obs_bfff622b.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P006/crops/obs_bfff622b.jpg"
+    }
+  },
+  {
+    "id": "P_P007",
+    "track_id": "P007",
+    "camera_id": "cam_auto_01",
+    "timestamp": "2.7",
+    "description": "Individual (P007) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P007/crops/obs_80de55d7.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P007/crops/obs_80de55d7.jpg"
+    }
+  },
+  {
+    "id": "P_P008",
+    "track_id": "P008",
+    "camera_id": "cam_auto_01",
+    "timestamp": "4.2",
+    "description": "Individual (P008) present in store area (duration: 2.3s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P008/crops/obs_69c08f78.jpg",
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 2.3s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P008/crops/obs_69c08f78.jpg"
+    }
+  },
+  {
+    "id": "P_P010",
+    "track_id": "P010",
+    "camera_id": "cam_auto_01",
+    "timestamp": "8.1",
+    "description": "Individual (P010) present in store area (duration: 1.7s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P010/crops/obs_6a70dd97.jpg",
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 1.7s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P010/crops/obs_6a70dd97.jpg"
+    }
+  },
+  {
+    "id": "P_P012",
+    "track_id": "P012",
+    "camera_id": "cam_auto_01",
+    "timestamp": "11.03",
+    "description": "Individual (P012) female customer standing at counter viewing jewelry / on mobile phone (duration: 2.7s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P012/crops/obs_4641dd67.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 2.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P012/crops/obs_4641dd67.jpg"
+    }
+  },
+  {
+    "id": "P_P013",
+    "track_id": "P013",
+    "camera_id": "cam_auto_01",
+    "timestamp": "11.19",
+    "description": "Individual (P013) present in store area (duration: 1.1s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P013/crops/obs_4de0fab6.jpg",
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 1.1s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P013/crops/obs_4de0fab6.jpg"
+    }
+  },
+  {
+    "id": "P_P015",
+    "track_id": "P015",
+    "camera_id": "cam_auto_01",
+    "timestamp": "12.46",
+    "description": "Individual (P015) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P015/crops/obs_f2854128.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P015/crops/obs_f2854128.jpg"
+    }
+  },
+  {
+    "id": "P_P016",
+    "track_id": "P016",
+    "camera_id": "cam_auto_01",
+    "timestamp": "12.96",
+    "description": "Individual (P016) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s).",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P016/crops/obs_c63517f5.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P016/crops/obs_c63517f5.jpg"
+    }
+  }
+]

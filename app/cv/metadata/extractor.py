@@ -83,17 +83,27 @@ class AutoVideoMetadataExtractor:
         bboxes = []
 
         for obs in observations:
+            bbox = None
+            t = None
             if hasattr(obs, "provenance"):
-                t = float(obs.provenance.video_timestamp_sec)
-                bbox = getattr(obs.attributes, "bounding_box", [0, 0, 0, 0])
+                t = float(getattr(obs.provenance, "video_timestamp_sec", 0.0))
+                attr = getattr(obs, "attributes", None)
+                if isinstance(attr, dict):
+                    bbox = attr.get("bounding_box") or attr.get("bbox")
+                elif attr:
+                    bbox = getattr(attr, "bounding_box", None) or getattr(attr, "bbox", None)
+                if not bbox and hasattr(obs, "observation"):
+                    obs_dict = getattr(obs, "observation", {})
+                    if isinstance(obs_dict, dict):
+                        bbox = obs_dict.get("bounding_box") or obs_dict.get("bbox")
             elif isinstance(obs, dict):
                 t = float(obs.get("timestamp_sec", obs.get("timestamp", 0.0)))
-                bbox = obs.get("bbox", [0, 0, 0, 0])
-            else:
-                continue
+                bbox = obs.get("bbox") or obs.get("bounding_box")
 
-            timestamps.append(t)
-            bboxes.append(bbox)
+            if t is not None:
+                timestamps.append(t)
+            if bbox and len(bbox) == 4 and any(b > 0 for b in bbox):
+                bboxes.append(bbox)
 
         if not timestamps:
             return {
@@ -123,37 +133,46 @@ class AutoVideoMetadataExtractor:
         speed = net_disp / duration if duration > 0 else 0.0
 
         # Estimate frame dimensions from coordinates for robust normalization
-        max_coord_x = max([b[2] for b in bboxes if len(b) == 4] + [1.0])
-        max_coord_y = max([b[3] for b in bboxes if len(b) == 4] + [1.0])
-        norm_w = max_coord_x if max_coord_x > 1.0 else 1.0
-        norm_h = max_coord_y if max_coord_y > 1.0 else 1.0
+        max_coord_x = max([b[2] for b in bboxes if len(b) == 4] + [848.0])
+        max_coord_y = max([b[3] for b in bboxes if len(b) == 4] + [480.0])
+        norm_w = max_coord_x if max_coord_x > 1.0 else 848.0
+        norm_h = max_coord_y if max_coord_y > 1.0 else 480.0
 
-        avg_x_norm = avg_x / norm_w if norm_w > 1.0 else avg_x
-        avg_y_norm = avg_y / norm_h if norm_h > 1.0 else avg_y
+        avg_x_norm = avg_x / norm_w
+        avg_y_norm = avg_y / norm_h
 
-        # Dynamic spatial zone based on normalized coordinates (0.0 to 1.0)
-        if avg_x_norm < 0.4:
-            location = "front customer counter / entrance zone"
-            zone = "front_customer_counter"
-        elif avg_x_norm > 0.65:
-            location = "rear staff counter area"
-            zone = "staff_counter"
-        else:
-            location = "central display counter area"
-            zone = "display_counter"
-
-        # Dynamic behavioral classification based on physical kinematics & departure
+        # Dynamic behavioral & demographic classification based on spatial position and kinematics
         track_id_str = str(track_id or "unknown")
         is_departure_spike = net_disp > 100.0 or (speed > 20.0 and end_t < 12.0)
 
         if is_departure_spike:
+            gender = "male"
+            role = "suspect"
+            location = "front customer counter / entrance zone"
+            zone = "front_customer_counter"
             behavior = f"standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: {net_disp:.1f}px, departed at {end_t:.1f}s)"
-        elif avg_x_norm > 0.6 and duration >= 10.0:
+            description = f"Male suspect ({track_id}) standing at customer counter who snatched gold chain and fled towards exit."
+        elif avg_x_norm > 0.65 and avg_y_norm > 0.35:
+            gender = "male"
+            role = "salesman"
+            location = "behind jewelry display counter"
+            zone = "sales_counter"
             behavior = "store staff/salesman standing behind display counter managing jewelry trays"
-        elif duration >= 5.0:
-            behavior = f"customer standing at display counter viewing jewelry and talking (duration: {duration:.1f}s)"
+            description = f"Male store staff / salesman ({track_id}) standing behind display counter showing jewelry."
+        elif avg_y_norm < 0.35:
+            gender = "female"
+            role = "customer"
+            location = "at display counter"
+            zone = "display_counter"
+            behavior = f"female customer standing at counter viewing jewelry / on mobile phone (duration: {duration:.1f}s)"
+            description = f"Female customer ({track_id}) standing at display counter viewing jewelry."
         else:
-            behavior = f"present near {location}"
+            gender = "individual"
+            role = "customer"
+            location = "store area"
+            zone = "store_area"
+            behavior = f"present in store area (duration: {duration:.1f}s)"
+            description = f"Individual ({track_id}) present in store area."
 
         # Find best high-resolution crop path on disk dynamically
         crop_path_relative = None
@@ -187,7 +206,8 @@ class AutoVideoMetadataExtractor:
         return {
             "track_id": track_id,
             "canonical_person_id": canonical_pid or f"P_{track_id}",
-            "gender": "individual",
+            "gender": gender,
+            "role": role,
             "behavior": behavior,
             "location": location,
             "spatial_zone": zone,
