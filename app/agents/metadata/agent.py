@@ -91,21 +91,21 @@ class MetadataAgent(BaseAgent):
                 active_vid = getattr(context, "active_video_id", None)
                 meta_json_candidates = []
                 if active_vid:
-                    meta_json_candidates.extend([
+                    for p in [
                         Path(f"dataset/metadata/{active_vid}.json"),
+                        Path(f"dataset/metadata/{active_vid}"),
                         Path(f"dataset/tracks/{active_vid}/metadata.json"),
-                        Path(f"dataset/metadata/{Path(active_vid).name}.json")
-                    ])
+                        Path(f"dataset/metadata/{Path(active_vid).name}.json"),
+                        Path(f"dataset/metadata/{Path(active_vid).name}")
+                    ]:
+                        if p.exists() and p not in meta_json_candidates:
+                            meta_json_candidates.append(p)
                 
-                # Scan all available metadata JSON files on disk
-                if Path("dataset/metadata").exists():
-                    for mf in Path("dataset/metadata").glob("*.json"):
-                        if mf not in meta_json_candidates:
-                            meta_json_candidates.append(mf)
-                if Path("dataset/tracks").exists():
-                    for tf in Path("dataset/tracks").glob("*/metadata.json"):
-                        if tf not in meta_json_candidates:
-                            meta_json_candidates.append(tf)
+                # If no specific candidate matched or active_vid was not passed, load strictly the single most recent video
+                if not meta_json_candidates and Path("dataset/metadata").exists():
+                    all_mfs = sorted(list(Path("dataset/metadata").glob("*.json")), key=lambda f: f.stat().st_mtime, reverse=True)
+                    if all_mfs:
+                        meta_json_candidates.append(all_mfs[0])
                 
                 for j_path in meta_json_candidates:
                     if j_path.exists():

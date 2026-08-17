@@ -235,7 +235,10 @@ class ChatPresenter:
                 )
 
             if not clip_url:
-                if completed_videos:
+                event_clips = sorted(list(Path("dataset/events").glob("**/clip.mp4")), key=lambda f: f.stat().st_mtime, reverse=True)
+                if event_clips:
+                    clip_url = f"/media/{event_clips[0].relative_to('dataset')}"
+                elif completed_videos:
                     clip_url = f"/media/videos/completed/{completed_videos[0].name}"
                 else:
                     input_videos = list(Path("input").glob("*.mp4"))

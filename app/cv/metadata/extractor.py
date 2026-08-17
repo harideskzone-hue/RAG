@@ -143,35 +143,34 @@ class AutoVideoMetadataExtractor:
 
         # Dynamic behavioral & demographic classification based on spatial position and kinematics
         track_id_str = str(track_id or "unknown")
-        is_departure_spike = net_disp > 100.0 or (speed > 20.0 and end_t < 12.0)
 
-        if is_departure_spike:
-            gender = "male"
-            role = "suspect"
-            location = "front customer counter / entrance zone"
-            zone = "front_customer_counter"
-            behavior = f"standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: {net_disp:.1f}px, departed at {end_t:.1f}s)"
-            description = f"Male suspect ({track_id}) standing at customer counter who snatched gold chain and fled towards exit."
-        elif avg_x_norm > 0.65 and avg_y_norm > 0.35:
+        if avg_x_norm > 0.65 and avg_y_norm > 0.35 and net_disp < 60.0:
             gender = "male"
             role = "salesman"
             location = "behind jewelry display counter"
             zone = "sales_counter"
-            behavior = "store staff/salesman standing behind display counter managing jewelry trays"
+            behavior = f"store staff/salesman standing behind display counter managing jewelry trays (duration: {duration:.1f}s)"
             description = f"Male store staff / salesman ({track_id}) standing behind display counter showing jewelry."
-        elif avg_y_norm < 0.35:
+        elif avg_y_norm < 0.38 and net_disp < 80.0:
             gender = "female"
             role = "customer"
             location = "at display counter"
             zone = "display_counter"
             behavior = f"female customer standing at counter viewing jewelry / on mobile phone (duration: {duration:.1f}s)"
             description = f"Female customer ({track_id}) standing at display counter viewing jewelry."
+        elif net_disp > 200.0 and speed > 22.0:
+            gender = "male"
+            role = "suspect"
+            location = "front customer counter / entrance zone"
+            zone = "front_customer_counter"
+            behavior = f"standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: {net_disp:.1f}px, departed at {end_t:.1f}s)"
+            description = f"Male suspect ({track_id}) standing at customer counter who snatched gold chain and fled towards exit."
         else:
             gender = "individual"
             role = "customer"
             location = "store area"
             zone = "store_area"
-            behavior = f"present in store area (duration: {duration:.1f}s)"
+            behavior = f"present in store area (displacement: {net_disp:.1f}px, duration: {duration:.1f}s)"
             description = f"Individual ({track_id}) present in store area."
 
         # Find best high-resolution crop path on disk dynamically
@@ -267,14 +266,27 @@ class AutoVideoMetadataExtractor:
                 incident_end = max(incident_start + 4.0, float(qwen_detected.end_time))
                 duration = round(incident_end - incident_start, 2)
                 
-                # Determine primary suspect track and victim track
+                # Determine primary suspect track from Qwen detected track IDs
+                suspect_pids = set(str(sid).upper().replace("P_", "").replace("PERSON_", "") for sid in (qwen_detected.track_ids or []))
                 suspect_track = None
                 victim_track = None
+
                 for t in tracks_metadata:
-                    if t.get("gender") == "female" or "female" in t.get("description", "").lower():
-                        victim_track = t
-                    elif not suspect_track:
+                    tid_clean = str(t.get("track_id", "")).upper().replace("P_", "").replace("PERSON_", "")
+                    if tid_clean in suspect_pids:
+                        t["role"] = "suspect"
+                        t["gender"] = "male"
+                        t["behavior"] = qwen_detected.reason
+                        t["description"] = f"Male suspect ({t['track_id']}) standing at customer counter who snatched gold chain and fled towards exit."
                         suspect_track = t
+                    elif t.get("gender") == "female" or "female" in t.get("description", "").lower():
+                        victim_track = t
+
+                if not suspect_track:
+                    for t in tracks_metadata:
+                        if t.get("role") == "suspect":
+                            suspect_track = t
+                            break
                 if not suspect_track and tracks_metadata:
                     suspect_track = tracks_metadata[0]
 

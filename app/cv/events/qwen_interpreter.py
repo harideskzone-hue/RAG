@@ -20,7 +20,7 @@ class QwenEventInterpreter:
     """
 
     def __init__(self, model_name: Optional[str] = None):
-        self.model_name = model_name or os.getenv("EVENT_LLM_MODEL", "llama-3.3-70b-versatile")
+        self.model_name = model_name or os.getenv("EVENT_LLM_MODEL", "qwen/qwen3.6-27b")
         api_key = os.getenv("GROQ_API_KEY")
         self.client = Groq(api_key=api_key) if api_key else None
 
