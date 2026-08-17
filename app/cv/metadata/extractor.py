@@ -267,89 +267,91 @@ class AutoVideoMetadataExtractor:
             })
 
         # Detect high-priority security incidents (Chain Snatching / Robbery / Interception)
-        is_crime_scene = any(kw in video_id.lower() for kw in ["robbery", "snatch", "crime", "theft", "assault", "chain"])
-        
-        # Check for rapid displacement / multi-person interaction
+        # Automated Event Identification via Qwen Vision-Language / Reasoning Model
         incident_event = None
-        if is_crime_scene or len(tracks_metadata) >= 2:
-            # Determine primary suspect track and victim track
-            suspect_track = None
-            victim_track = None
-            for t in tracks_metadata:
-                if t.get("gender") == "female" or "female" in t.get("description", "").lower():
-                    victim_track = t
-                elif not suspect_track:
-                    suspect_track = t
+        try:
+            from app.cv.events.qwen_interpreter import QwenEventInterpreter
+            qwen = QwenEventInterpreter()
+            qwen_detected = qwen.interpret_scene_events(video_id=video_id, tracks_summary=tracks_metadata)
             
-            if not suspect_track and tracks_metadata:
-                suspect_track = tracks_metadata[0]
+            if qwen_detected and qwen_detected.event_type.value != "ABSTAIN":
+                incident_id = f"incident_{video_id.replace('.mp4', '').replace(' ', '_')}"
+                incident_start = max(0.0, float(qwen_detected.start_time))
+                incident_end = max(incident_start + 4.0, float(qwen_detected.end_time))
+                duration = round(incident_end - incident_start, 2)
+                
+                # Determine primary suspect track and victim track
+                suspect_track = None
+                victim_track = None
+                for t in tracks_metadata:
+                    if t.get("gender") == "female" or "female" in t.get("description", "").lower():
+                        victim_track = t
+                    elif not suspect_track:
+                        suspect_track = t
+                if not suspect_track and tracks_metadata:
+                    suspect_track = tracks_metadata[0]
 
-            incident_id = f"incident_{video_id.replace('.mp4', '').replace(' ', '_')}"
-            incident_start = 0.0
-            incident_end = 10.0
-            if suspect_track:
-                incident_start = max(0.0, float(suspect_track.get("start_time_sec", 0.0)))
-                incident_end = incident_start + 10.0
+                # Dynamically slice exact event window using ffmpeg H.264
+                clip_url = None
+                thumb_url = None
+                source_video_candidates = [
+                    Path("dataset/storage/vista-video-bucket/cctv.mp4"),
+                    Path("dataset/storage/vista-video-bucket") / video_id,
+                    Path("dataset/storage") / video_id,
+                    Path("input/completed") / video_id,
+                    Path("input/watch") / video_id,
+                    Path("input/processing") / video_id,
+                    Path("input") / video_id
+                ]
+                source_video_path = next((p for p in source_video_candidates if p.exists()), None)
+                if not source_video_path:
+                    all_mp4s = list(Path("dataset/storage").glob("**/*.mp4")) + list(Path("input").glob("**/*.mp4"))
+                    if all_mp4s:
+                        source_video_path = all_mp4s[0]
+                
+                if source_video_path:
+                    try:
+                        from app.cv.events.clip_slicer import EventClipSlicer
+                        slicer = EventClipSlicer()
+                        ok, cp, tp, _ = slicer.slice_event_clip(
+                            source_video_path=str(source_video_path),
+                            event_id=incident_id,
+                            start_sec=incident_start,
+                            end_sec=incident_end,
+                            camera_id=camera_id,
+                            video_id=video_id,
+                            metadata={"incident_type": qwen_detected.event_type.value, "qwen_reason": qwen_detected.reason}
+                        )
+                        if ok:
+                            clip_url = f"/media/events/{incident_id}/clip.mp4"
+                            thumb_url = f"/media/events/{incident_id}/thumbnail.jpg"
+                    except Exception as clip_err:
+                        logger.warning(f"AutoVideoMetadataExtractor: Could not slice incident clip: {clip_err}")
 
-            # Attempt to slice 10-second exact video clip
-            clip_url = None
-            thumb_url = None
-            source_video_candidates = [
-                Path("dataset/storage/vista-video-bucket/cctv.mp4"),
-                Path("dataset/storage/vista-video-bucket") / video_id,
-                Path("dataset/storage") / video_id,
-                Path("input/completed") / video_id,
-                Path("input/watch") / video_id,
-                Path("input/processing") / video_id,
-                Path("input") / video_id
-            ]
-            source_video_path = next((p for p in source_video_candidates if p.exists()), None)
-            if not source_video_path:
-                # Find any available mp4 in dataset/storage or input
-                all_mp4s = list(Path("dataset/storage").glob("**/*.mp4")) + list(Path("input").glob("**/*.mp4"))
-                if all_mp4s:
-                    source_video_path = all_mp4s[0]
-            
-            if source_video_path:
-                try:
-                    from app.cv.events.clip_slicer import EventClipSlicer
-                    slicer = EventClipSlicer()
-                    ok, cp, tp, _ = slicer.slice_event_clip(
-                        source_video_path=str(source_video_path),
-                        event_id=incident_id,
-                        start_sec=incident_start,
-                        end_sec=incident_end,
-                        camera_id=camera_id,
-                        video_id=video_id,
-                        metadata={"incident_type": "chain_snatching_robbery"}
-                    )
-                    if ok:
-                        clip_url = f"/media/events/{incident_id}/clip.mp4"
-                        thumb_url = f"/media/events/{incident_id}/thumbnail.jpg"
-                except Exception as clip_err:
-                    logger.warning(f"AutoVideoMetadataExtractor: Could not slice incident clip: {clip_err}")
-
-            incident_event = {
-                "event_id": incident_id,
-                "event_type": "SECURITY_INCIDENT",
-                "incident_type": "chain_snatching_robbery",
-                "title": "🚨 CRITICAL SECURITY INCIDENT: Chain Snatching / Robbery Detected",
-                "severity": "CRITICAL",
-                "camera_id": camera_id,
-                "video_id": video_id,
-                "start_time_sec": incident_start,
-                "end_time_sec": incident_end,
-                "duration_sec": 10.0,
-                "timestamp_sec": incident_start,
-                "suspect_track_id": suspect_track.get("track_id") if suspect_track else "P001",
-                "suspect_canonical_id": suspect_track.get("canonical_person_id") if suspect_track else "PERSON_SUSPECT",
-                "victim_track_id": victim_track.get("track_id") if victim_track else None,
-                "clip_url": clip_url or f"/media/events/{incident_id}/clip.mp4",
-                "thumbnail_url": thumb_url or (suspect_track.get("crop_url") if suspect_track else None),
-                "description": f"Critical chain snatching / robbery incident detected at {suspect_track.get('location', 'entrance area') if suspect_track else 'entrance'}. Suspect approached victim, forcefully snatched gold chain, and rapidly fled the scene."
-            }
-            # Prepend as authoritative primary event
-            events_metadata.insert(0, incident_event)
+                event_title_str = qwen_detected.event_type.value.replace("_", " ").title()
+                incident_event = {
+                    "event_id": incident_id,
+                    "event_type": "SECURITY_INCIDENT",
+                    "incident_type": qwen_detected.event_type.value.lower(),
+                    "title": f"🚨 CRITICAL SECURITY INCIDENT: {event_title_str} Detected",
+                    "severity": qwen_detected.severity or "CRITICAL",
+                    "camera_id": camera_id,
+                    "video_id": video_id,
+                    "start_time_sec": incident_start,
+                    "end_time_sec": incident_end,
+                    "duration_sec": duration,
+                    "timestamp_sec": incident_start,
+                    "suspect_track_id": suspect_track.get("track_id") if suspect_track else "P001",
+                    "suspect_canonical_id": suspect_track.get("canonical_person_id") if suspect_track else "PERSON_SUSPECT",
+                    "victim_track_id": victim_track.get("track_id") if victim_track else None,
+                    "clip_url": clip_url or f"/media/events/{incident_id}/clip.mp4",
+                    "thumbnail_url": thumb_url or (suspect_track.get("crop_url") if suspect_track else None),
+                    "description": qwen_detected.reason or f"Critical {event_title_str} incident detected at {suspect_track.get('location', 'street area') if suspect_track else 'street area'}."
+                }
+                # Prepend as authoritative primary event
+                events_metadata.insert(0, incident_event)
+        except Exception as qwen_err:
+            logger.warning(f"Qwen incident identification failed: {qwen_err}")
 
         metadata_doc = {
             "video_id": video_id,
