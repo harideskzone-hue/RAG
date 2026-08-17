@@ -199,17 +199,22 @@ class ChatPresenter:
                 p_id = meta.get("canonical_person_id") or attr.get("original_id") or origin.get("track_id")
 
             # Enrich from metadata JSON index
-            if p_id and (str(p_id) in pid_to_meta or str(p_id).replace("PERSON_", "P_") in pid_to_meta):
-                matched_meta = pid_to_meta.get(str(p_id)) or pid_to_meta.get(str(p_id).replace("PERSON_", "P_"))
-                if matched_meta:
-                    if not desc or "observed on camera" in desc:
-                        desc = matched_meta.get("description", desc)
-                    if not meta.get("gender"):
-                        meta["gender"] = matched_meta.get("gender")
-                    if not meta.get("role"):
-                        meta["role"] = matched_meta.get("role")
-                    if not meta.get("behavior"):
-                        meta["behavior"] = matched_meta.get("behavior")
+            matched_meta = (
+                pid_to_meta.get(str(p_id))
+                or pid_to_meta.get(str(p_id).replace("PERSON_", ""))
+                or pid_to_meta.get(str(p_id).replace("PERSON_", "P_"))
+                or pid_to_meta.get(f"PERSON_{p_id}")
+                or pid_to_meta.get(f"P_{p_id}")
+            )
+            if matched_meta:
+                if not desc or "observed on camera" in desc:
+                    desc = matched_meta.get("description", desc)
+                if not meta.get("gender"):
+                    meta["gender"] = matched_meta.get("gender")
+                if not meta.get("role"):
+                    meta["role"] = matched_meta.get("role")
+                if not meta.get("behavior"):
+                    meta["behavior"] = matched_meta.get("behavior")
 
             crop_url = e.get("crop_url") or meta.get("crop_url")
             timestamp = e.get("timestamp") or meta.get("video_timestamp_sec") or meta.get("timestamp")
@@ -252,14 +257,20 @@ class ChatPresenter:
         seen_pids = set()
         evidence = []
 
+        def normalize_pid_key(pid: str) -> str:
+            if not pid:
+                return ""
+            s = str(pid).strip().upper()
+            s = s.replace("PERSON_", "").replace("P_", "")
+            if s.startswith("P") and s[1:].isdigit():
+                return f"P{int(s[1:]):03d}"
+            return s
+
         for e in raw_evidence:
             p_id, crop_url, raw_ts, clip_url = resolve_details_for_evidence(e)
-            norm_pid = str(p_id) if p_id else None
+            clean_pid = normalize_pid_key(p_id)
             
-            # Normalize PID representation (e.g. P_P004 -> P_004 or P004)
-            clean_pid = norm_pid.replace("P_P", "P") if norm_pid else None
-            
-            # Deduplicate by person_id to prevent duplicate cards for the same person
+            # Deduplicate by normalized person_id to prevent duplicate cards for the same person
             if clean_pid and clean_pid in seen_pids:
                 continue
             if clean_pid:
@@ -299,8 +310,8 @@ class ChatPresenter:
                 confidence=float(e.get("confidence", 0.9)),
                 crop_url=crop_url,
                 clip_url=clip_url,
-                person_id=norm_pid,
-                track_id=norm_pid
+                person_id=clean_pid or str(p_id),
+                track_id=clean_pid or str(p_id)
             ))
 
         AGENT_STAGE_NAMES = {
@@ -358,7 +369,8 @@ class ChatPresenter:
             if is_absent_target:
                 answer = "I analyzed the CCTV footage. No matching individuals, children, or vehicles were detected in the area."
         else:
-            detection_status = canonical_response.get("detection_status", "DETECTED")
+            detection_status = "DETECTED"
+            status = "SUCCESS"
             person_count = len(evidence)
 
         zone = canonical_response.get("zone", "Entrance (cam_auto_01)")

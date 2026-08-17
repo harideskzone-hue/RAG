@@ -115,6 +115,8 @@ class ReasoningCoordinator:
                             behavior = meta.get("behavior") or ""
                             loc = meta.get("location") or ""
                             cam = meta.get("camera_id") or getattr(ev, "camera_id", "cam_auto_01")
+                            pid = meta.get("canonical_person_id") or getattr(ev, "person_id", "") or getattr(ev, "subject_id", "")
+                            ts = getattr(ev, "timestamp", None)
                             vid_sec = meta.get("video_timestamp_sec") or meta.get("timestamp_sec") or meta.get("start_time_sec")
                             ts_formatted = ""
                             if vid_sec is not None:
