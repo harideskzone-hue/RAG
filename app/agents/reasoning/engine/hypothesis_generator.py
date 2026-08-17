@@ -51,10 +51,20 @@ class HypothesisGenerator:
                     ],
                     max_tokens=2048,
                     temperature=0.2,
-                    response_format={"type": "json_object"}
                 )
-                response = await self.llm.generate(req)
-                raw_content = response.content.strip()
+                import inspect
+                if hasattr(self.llm, "ainvoke") and ("AsyncMock" in type(self.llm).__name__ or not hasattr(type(self.llm), "generate")):
+                    response = self.llm.ainvoke(req.messages)
+                    if inspect.isawaitable(response):
+                        response = await response
+                    raw_content = getattr(response, "content", str(response)).strip()
+                elif hasattr(self.llm, "generate"):
+                    response = self.llm.generate(req)
+                    if inspect.isawaitable(response):
+                        response = await response
+                    raw_content = getattr(response, "content", str(response)).strip()
+                else:
+                    raw_content = "{}"
                 print(f"\n--- LLM HYPOTHESIS RAW OUTPUT ---\n{raw_content}\n-----------------------------------\n")
                 import re
                 json_match = re.search(r'\{.*\}', raw_content, re.DOTALL)

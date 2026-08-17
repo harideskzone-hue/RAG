@@ -179,8 +179,12 @@ class ReasoningCoordinator:
                         else:
                             final_answer = raw_text
                     elif hasattr(self.service.llm_client, "ainvoke"):
-                        llm_resp = await self.service.llm_client.ainvoke(req.messages)
-                        final_answer = llm_resp.content.strip()
+                        import inspect
+                        llm_resp = self.service.llm_client.ainvoke(req.messages)
+                        if inspect.isawaitable(llm_resp):
+                            llm_resp = await llm_resp
+                        raw_text = getattr(llm_resp, "content", str(llm_resp))
+                        final_answer = raw_text.strip()
                     else:
                         final_answer = "Based on the verified evidence:\n" + "\n".join(f"- {s}" for s in valid_statements)
                 except Exception as e:

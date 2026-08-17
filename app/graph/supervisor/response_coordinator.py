@@ -77,6 +77,16 @@ class ResponseCoordinator:
                     continue
             valid_provenance_evidence.append(ev)
 
+        # Build execution telemetry steps
+        exec_steps = []
+        for rec in getattr(context, "execution_ledger", []):
+            exec_steps.append({
+                "name": rec.agent_name,
+                "status": rec.status,
+                "latency_ms": int(rec.execution_time_ms),
+                "error": rec.error
+            })
+
         # Check for guardrail block
         if "guardrail_agent" in context.results:
             gr = context.results["guardrail_agent"]
@@ -95,21 +105,11 @@ class ResponseCoordinator:
                     "execution": {"status": "completed", "steps": exec_steps}
                 }
 
-        # Build execution telemetry steps
-        exec_steps = []
-        for rec in getattr(context, "execution_ledger", []):
-            exec_steps.append({
-                "name": rec.agent_name,
-                "status": rec.status,
-                "latency_ms": int(rec.execution_time_ms),
-                "error": rec.error
-            })
-
         # Conversational / General Query Early Exit (Greetings, Help, Capability)
         query_intent = getattr(context, "query_intent", None)
         domain = getattr(query_intent, "domain", "investigation")
         operation = getattr(query_intent, "operation", "")
-        raw_query = getattr(context, "current_query", "").strip().lower()
+        raw_query = str(getattr(context, "current_query", "") or "").strip().lower()
         is_general_query = (domain == "general" or operation in ("greeting", "capability_explanation") or raw_query in ("hi", "hello", "hey"))
 
         if is_general_query and "reasoning_agent" in context.results:

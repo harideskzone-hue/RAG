@@ -79,6 +79,11 @@ class NativeVectorStore(VectorStore):
         return await asyncio.to_thread(self._search, collection_name, embedding, top_k, allowed_cameras, video_id)
 
     def _search(self, collection_name: str, embedding: list[float], top_k: int, allowed_cameras: list[str] = None, video_id: str = None) -> list[VectorMatch]:
+        if isinstance(self.vectors, np.ndarray):
+            self.vectors = {collection_name: self.vectors}
+        if isinstance(self.metadata, list):
+            self.metadata = {collection_name: self.metadata}
+            
         if collection_name not in self.vectors:
             self._load(collection_name)
         

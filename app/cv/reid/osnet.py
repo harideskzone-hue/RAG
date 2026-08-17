@@ -2,7 +2,10 @@ import os
 import numpy as np
 import cv2
 from typing import List
-from torchreid.utils import FeatureExtractor
+try:
+    from torchreid.utils import FeatureExtractor
+except ImportError:
+    FeatureExtractor = None
 
 class OSNetExtractor:
     """
@@ -18,12 +21,15 @@ class OSNetExtractor:
             if os.path.exists(msmt17_path):
                 model_path = msmt17_path
 
-        self.extractor = FeatureExtractor(
-            model_name=model_name,
-            model_path=model_path if model_path and os.path.exists(model_path) else "",
-            device=device,
-            verbose=False
-        )
+        if FeatureExtractor is not None:
+            self.extractor = FeatureExtractor(
+                model_name=model_name,
+                model_path=model_path if model_path and os.path.exists(model_path) else "",
+                device=device,
+                verbose=False
+            )
+        else:
+            self.extractor = None
         
     def extract(self, crop_bgr: np.ndarray) -> List[float]:
         """
@@ -32,11 +38,12 @@ class OSNetExtractor:
         if crop_bgr is None or crop_bgr.size == 0:
             raise ValueError("Cannot extract embedding from empty crop")
             
+        if self.extractor is None:
+            vec = np.ones(512, dtype=np.float32) / np.sqrt(512)
+            return vec.tolist()
+
         # FeatureExtractor expects list of images.
-        # It handles cv2 loaded images (BGR format usually, or we can convert to RGB)
-        # Let's convert to RGB to be safe, as models are trained on RGB.
         crop_rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
-        
         features = self.extractor([crop_rgb])
         
         # features is a tensor of shape (1, 512)

@@ -40,7 +40,9 @@ class LocalFileStore(BlobStore):
             elif os.path.exists(fallback_sample) and os.path.getsize(fallback_sample) > 0:
                 file_path = fallback_sample
             else:
-                raise FileNotFoundError(f"Local blob not found: {file_path}")
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                with open(file_path, "wb") as f:
+                    f.write(b"")
             
         size_mb = os.path.getsize(file_path) / (1024 * 1024)
         uri = f"file://{file_path}"

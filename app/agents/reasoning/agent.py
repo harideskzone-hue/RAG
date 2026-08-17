@@ -73,7 +73,7 @@ class ReasoningAgent(BaseAgent):
                 query_intent = getattr(context, "query_intent", None)
                 domain = getattr(query_intent, "domain", "investigation")
                 operation = getattr(query_intent, "operation", "")
-                raw_query = getattr(context, "current_query", "").strip()
+                raw_query = str(getattr(context, "current_query", "") or "").strip()
                 query_clean = raw_query.lower().strip(" .,!?/")
                 
                 is_greeting = (
