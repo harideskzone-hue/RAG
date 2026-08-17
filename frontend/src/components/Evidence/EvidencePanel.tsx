@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChatResponse, Evidence } from '../../api/client';
-import { Camera, Clock, Video, User, X, ShieldCheck, AlertTriangle, Play } from 'lucide-react';
+import { Camera, Clock, Video, User, X, ShieldCheck, ShieldAlert, AlertTriangle, Play } from 'lucide-react';
 
 interface EvidencePanelProps {
   selectedContract: ChatResponse | null;
@@ -141,6 +141,32 @@ export function EvidencePanel({ selectedContract }: EvidencePanelProps) {
               })}
             </div>
           </div>
+        ) : (status === 'CRITICAL_ALERT' || status === 'INCIDENT_ALERT') ? (
+          <div className="empty-scene-verification" style={{
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(30, 27, 75, 0.3) 100%)',
+            border: '1px solid rgba(239, 68, 68, 0.4)',
+            boxShadow: '0 0 15px rgba(239, 68, 68, 0.15)'
+          }}>
+            <div className="empty-scene-header">
+              <ShieldAlert size={28} className="text-red-400 animate-pulse" />
+              <h4 style={{ color: '#f87171' }}>🚨 Critical Incident Alert</h4>
+              <p style={{ color: '#fca5a5' }}>
+                Forensic CCTV pipeline identified a <strong>Chain Snatching / Robbery</strong> event during window <strong>{windowStr}</strong>.
+              </p>
+            </div>
+            {mainClipUrl && (
+              <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  className="scene-play-btn"
+                  style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626', width: '100%', justifyContent: 'center', padding: '10px' }}
+                  onClick={() => setActiveVideoModal(mainClipUrl)}
+                >
+                  <Play size={15} fill="currentColor" /> Play Sliced Incident Video Clip
+                </button>
+              </div>
+            )}
+          </div>
         ) : status === 'EMPTY' ? (
           <div className="empty-scene-verification">
             <div className="empty-scene-header">
@@ -187,14 +213,24 @@ export function EvidencePanel({ selectedContract }: EvidencePanelProps) {
             <div className="video-modal-header">
               <div className="modal-title-group">
                 <Video size={16} className="text-blue-400" />
-                <span className="font-semibold text-sm">Authoritative CCTV Video Evidence</span>
+                <span className="font-semibold text-sm">
+                  {activeVideoModal.includes('/events/') ? '🚨 Sliced Incident Video Evidence' : 'Authoritative CCTV Video Evidence'}
+                </span>
               </div>
               <button type="button" className="close-btn" onClick={() => setActiveVideoModal(null)}>
                 <X size={16} />
               </button>
             </div>
             <div className="video-player-wrapper">
-              <video controls autoPlay className="evidence-video-player" src={activeVideoModal}>
+              <video
+                controls
+                autoPlay
+                playsInline
+                preload="auto"
+                className="evidence-video-player"
+                key={activeVideoModal}
+              >
+                <source src={activeVideoModal} type="video/mp4" />
                 Your browser does not support playing this video.
               </video>
             </div>

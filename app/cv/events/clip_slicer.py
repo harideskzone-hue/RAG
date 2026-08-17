@@ -62,30 +62,65 @@ class EventClipSlicer:
 
         clip_start_sec = max(0.0, start_sec - self.padding_before)
         clip_end_sec = min(total_duration, end_sec + self.padding_after) if total_duration > 0 else (end_sec + self.padding_after)
+        duration_sec = max(1.0, clip_end_sec - clip_start_sec)
 
         start_frame = int(clip_start_sec * fps)
         end_frame = max(start_frame + 1, int(clip_end_sec * fps))
 
-        cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+        # Try slicing with ffmpeg for pristine H.264 browser compatibility
+        import subprocess
+        ffmpeg_cmd = [
+            "ffmpeg", "-y",
+            "-ss", str(clip_start_sec),
+            "-i", str(source_path),
+            "-t", str(duration_sec),
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p",
+            "-preset", "fast",
+            "-movflags", "+faststart",
+            "-an",
+            str(clip_path)
+        ]
+        
+        ffmpeg_success = False
+        try:
+            res = subprocess.run(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+            if res.returncode == 0 and clip_path.exists() and clip_path.stat().st_size > 1000:
+                ffmpeg_success = True
+        except Exception as e:
+            logger.warning(f"ffmpeg slicing failed, falling back to OpenCV: {e}")
 
-        # Write clip with MP4V / H.264
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(str(clip_path), fourcc, fps, (width, height))
-
-        current_frame = start_frame
         best_thumbnail_frame = None
 
-        while current_frame <= end_frame:
+        if not ffmpeg_success:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+            fourcc = cv2.VideoWriter_fourcc(*'avc1')
+            out = cv2.VideoWriter(str(clip_path), fourcc, fps, (width, height))
+            if not out.isOpened():
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                out = cv2.VideoWriter(str(clip_path), fourcc, fps, (width, height))
+
+            current_frame = start_frame
+            while current_frame <= end_frame:
+                ret, frame = cap.read()
+                if not ret or frame is None:
+                    break
+                out.write(frame)
+                if best_thumbnail_frame is None and current_frame >= int((start_sec + end_sec) / 2.0 * fps):
+                    best_thumbnail_frame = frame.copy()
+                current_frame += 1
+
+            out.release()
+
+        # Extract best thumbnail frame
+        if best_thumbnail_frame is None:
+            mid_frame = int((clip_start_sec + clip_end_sec) / 2.0 * fps)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, mid_frame)
             ret, frame = cap.read()
-            if not ret or frame is None:
-                break
-            out.write(frame)
-            if best_thumbnail_frame is None and current_frame >= int((start_sec + end_sec) / 2.0 * fps):
-                best_thumbnail_frame = frame.copy()
-            current_frame += 1
+            if ret and frame is not None:
+                best_thumbnail_frame = frame
 
         cap.release()
-        out.release()
 
         # Generate thumbnail
         if best_thumbnail_frame is not None:

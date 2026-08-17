@@ -309,7 +309,10 @@ class ChatPresenter:
         timeline = canonical_response.get("timeline", [])
         processing = canonical_response.get("processing", {})
 
-        if is_absent_target or len(evidence) == 0:
+        if canonical_response.get("detection_status") in ("CRITICAL_ALERT", "INCIDENT_ALERT"):
+            detection_status = canonical_response["detection_status"]
+            person_count = max(1, len(evidence))
+        elif is_absent_target or len(evidence) == 0:
             detection_status = "EMPTY"
             person_count = 0
             if is_absent_target:
