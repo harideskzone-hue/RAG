@@ -245,30 +245,37 @@ class ChatPresenter:
             return p_id, crop_url, timestamp, clip_url
 
         # Query Target Filtering (Strict Grounding: Do not return wrong or arbitrary persons)
-        # Determine query target filter
+        # Determine query target filter with strict word boundaries
         q_lower = str(canonical_response.get("query", "")).lower()
-        is_women_query = any(w in q_lower for w in ["women", "woman", "female", "lady", "girl"])
-        is_men_query = any(w in q_lower for w in [" men", " man", "male", "gentleman", "boy", "guys"]) and not is_women_query
-        is_suspect_query = any(w in q_lower for w in ["suspect", "snatcher", "thief", "robber", "culprit", "snatch"])
-        is_absent_target = any(w in q_lower for w in ["child", "kid", "baby", "vehicle", "car", "truck", "weapon", "gun", "knife", "animal", "dog", "cat"])
+        is_women_query = bool(re.search(r'\b(women|womens|woman|womans|female|females|lady|ladies|girl|girls)\b', q_lower))
+        is_men_query = bool(re.search(r'\b(men|mens|man|mans|male|males|salesman|salesmen|gentleman|gentlemen|boy|boys|guy|guys)\b', q_lower)) and not is_women_query
+        is_suspect_query = bool(re.search(r'\b(suspect|suspects|snatcher|snatchers|thief|thieves|robber|robbers|culprit|culprits|snatch)\b', q_lower))
+        is_absent_target = bool(re.search(r'\b(child|children|kid|kids|baby|babies|vehicle|vehicles|car|cars|truck|trucks|weapon|weapons|gun|guns|knife|knives|animal|animals|dog|dogs|cat|cats)\b', q_lower))
 
         # Build deduplicated evidence list (1 card per unique individual)
         raw_evidence = canonical_response.get("evidence", []) if not is_absent_target else []
         seen_pids = set()
         evidence = []
 
-        def normalize_pid_key(pid: str) -> str:
+        def normalize_pid_key(pid: str, desc: str = "") -> str:
             if not pid:
                 return ""
             s = str(pid).strip().upper()
+            if desc:
+                m = re.search(r'\(P_?(\d+)\)', desc, re.IGNORECASE)
+                if m:
+                    return f"P{int(m.group(1)):03d}"
             s = s.replace("PERSON_", "").replace("P_", "")
             if s.startswith("P") and s[1:].isdigit():
                 return f"P{int(s[1:]):03d}"
+            if s.isdigit():
+                return f"P{int(s):03d}"
             return s
 
         for e in raw_evidence:
             p_id, crop_url, raw_ts, clip_url = resolve_details_for_evidence(e)
-            clean_pid = normalize_pid_key(p_id)
+            desc_val = str(e.get("description") or "")
+            clean_pid = normalize_pid_key(p_id, desc_val)
             
             # Deduplicate by normalized person_id to prevent duplicate cards for the same person
             if clean_pid and clean_pid in seen_pids:
@@ -406,10 +413,21 @@ class ChatPresenter:
                 answer = "I analyzed the CCTV footage. No female individuals were verified in the camera coverage."
             else:
                 answer = f"I analyzed the CCTV footage and identified {person_count} female individual(s):\n" + "\n".join([f"- Person {e.person_id}: {e.description.split('{')[0].strip()}" for e in evidence])
-        elif answer and ("verified individuals" in answer or "people" in answer):
-            import re
-            answer = re.sub(r'\b\d+\s+verified individuals\b', f"{person_count} unique individuals", answer)
-            answer = re.sub(r'\b\d+\s+people\b', f"{person_count} people", answer)
+        else:
+            # General person/people query (returns all individuals with dynamic breakdown)
+            men_found = sum(1 for e in evidence if "male" in str(getattr(e, "description", "")).lower() and "female" not in str(getattr(e, "description", "")).lower())
+            women_found = sum(1 for e in evidence if "female" in str(getattr(e, "description", "")).lower())
+            breakdown_parts = []
+            if men_found:
+                breakdown_parts.append(f"{men_found} male")
+            if women_found:
+                breakdown_parts.append(f"{women_found} female")
+            breakdown_str = f" ({', '.join(breakdown_parts)})" if breakdown_parts else ""
+            
+            if person_count == 0:
+                answer = "I analyzed the CCTV footage. No persons were detected in the camera coverage."
+            else:
+                answer = f"I analyzed the CCTV footage and identified {person_count} unique individual(s){breakdown_str}:\n" + "\n".join([f"- Person {e.person_id}: {e.description.split('{')[0].strip()}" for e in evidence])
 
         return ChatResponse(
             status=status,

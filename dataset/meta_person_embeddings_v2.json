@@ -1,1 +1,1503 @@
-[{"id": "PERSON_P001", "track_id": "P001", "camera_id": "cam_auto_01", "timestamp": "0.0", "description": "Male store staff / salesman (P001) standing behind display counter showing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P001/crops/obs_95194ea7.jpg", "attributes": {"gender": "male", "role": "salesman", "behavior": "store staff/salesman standing behind display counter managing jewelry trays", "location": "behind jewelry display counter", "spatial_zone": "sales_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P001/crops/obs_95194ea7.jpg"}}, {"id": "PERSON_P002", "track_id": "P002", "camera_id": "cam_auto_01", "timestamp": "0.0", "description": "Female customer (P002) standing at display counter viewing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P002/crops/obs_dc7326a1.jpg", "attributes": {"gender": "female", "role": "customer", "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 13.7s)", "location": "at display counter", "spatial_zone": "display_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P002/crops/obs_dc7326a1.jpg"}}, {"id": "PERSON_P003", "track_id": "P003", "camera_id": "cam_auto_01", "timestamp": "0.0", "description": "Female customer (P003) standing at display counter viewing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P003/crops/obs_a3cff28a.jpg", "attributes": {"gender": "female", "role": "customer", "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 13.5s)", "location": "at display counter", "spatial_zone": "display_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P003/crops/obs_a3cff28a.jpg"}}, {"id": "PERSON_P004", "track_id": "P004", "camera_id": "cam_auto_01", "timestamp": "0.1", "description": "Male suspect (P004) standing at customer counter who snatched gold chain and fled towards exit.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P004/crops/obs_4a61fb36.jpg", "attributes": {"gender": "male", "role": "suspect", "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 292.4px, departed at 10.8s)", "location": "front customer counter / entrance zone", "spatial_zone": "front_customer_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P004/crops/obs_4a61fb36.jpg"}}, {"id": "PERSON_P005", "track_id": "P005", "camera_id": "cam_auto_01", "timestamp": "0.13", "description": "Individual (P005) present in store area.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P005/crops/obs_aa670cb3.jpg", "attributes": {"gender": "individual", "role": "customer", "behavior": "present in store area (duration: 3.0s)", "location": "store area", "spatial_zone": "store_area", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P005/crops/obs_aa670cb3.jpg"}}, {"id": "PERSON_P006", "track_id": "P006", "camera_id": "cam_auto_01", "timestamp": "0.47", "description": "Female customer (P006) standing at display counter viewing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P006/crops/obs_bfff622b.jpg", "attributes": {"gender": "female", "role": "customer", "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s)", "location": "at display counter", "spatial_zone": "display_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P006/crops/obs_bfff622b.jpg"}}, {"id": "PERSON_P007", "track_id": "P007", "camera_id": "cam_auto_01", "timestamp": "2.7", "description": "Female customer (P007) standing at display counter viewing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P007/crops/obs_80de55d7.jpg", "attributes": {"gender": "female", "role": "customer", "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)", "location": "at display counter", "spatial_zone": "display_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P007/crops/obs_80de55d7.jpg"}}, {"id": "PERSON_P008", "track_id": "P008", "camera_id": "cam_auto_01", "timestamp": "4.2", "description": "Individual (P008) present in store area.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P008/crops/obs_69c08f78.jpg", "attributes": {"gender": "individual", "role": "customer", "behavior": "present in store area (duration: 2.3s)", "location": "store area", "spatial_zone": "store_area", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P008/crops/obs_69c08f78.jpg"}}, {"id": "PERSON_P010", "track_id": "P010", "camera_id": "cam_auto_01", "timestamp": "8.1", "description": "Individual (P010) present in store area.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P010/crops/obs_6a70dd97.jpg", "attributes": {"gender": "individual", "role": "customer", "behavior": "present in store area (duration: 1.7s)", "location": "store area", "spatial_zone": "store_area", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P010/crops/obs_6a70dd97.jpg"}}, {"id": "PERSON_P012", "track_id": "P012", "camera_id": "cam_auto_01", "timestamp": "11.03", "description": "Female customer (P012) standing at display counter viewing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P012/crops/obs_4641dd67.jpg", "attributes": {"gender": "female", "role": "customer", "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 2.7s)", "location": "at display counter", "spatial_zone": "display_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P012/crops/obs_4641dd67.jpg"}}, {"id": "PERSON_P013", "track_id": "P013", "camera_id": "cam_auto_01", "timestamp": "11.19", "description": "Individual (P013) present in store area.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P013/crops/obs_4de0fab6.jpg", "attributes": {"gender": "individual", "role": "customer", "behavior": "present in store area (duration: 1.1s)", "location": "store area", "spatial_zone": "store_area", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P013/crops/obs_4de0fab6.jpg"}}, {"id": "PERSON_P015", "track_id": "P015", "camera_id": "cam_auto_01", "timestamp": "12.46", "description": "Female customer (P015) standing at display counter viewing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P015/crops/obs_f2854128.jpg", "attributes": {"gender": "female", "role": "customer", "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)", "location": "at display counter", "spatial_zone": "display_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P015/crops/obs_f2854128.jpg"}}, {"id": "PERSON_P016", "track_id": "P016", "camera_id": "cam_auto_01", "timestamp": "12.96", "description": "Female customer (P016) standing at display counter viewing jewelry.", "bbox": [0, 0, 100, 100], "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P016/crops/obs_c63517f5.jpg", "attributes": {"gender": "female", "role": "customer", "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)", "location": "at display counter", "spatial_zone": "display_counter", "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P016/crops/obs_c63517f5.jpg"}}, {"id": "PERSON_3DA777FD", "camera_id": "cam_auto_01", "timestamp": "0.0", "description": "", "bbox": null}, {"id": "PERSON_P015", "camera_id": "cam_auto_01", "timestamp": "12.39247572815534", "description": "", "bbox": null}]
+[
+  {
+    "id": "PERSON_P001",
+    "track_id": "P001",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.0",
+    "description": "Male suspect (P001) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P001/crops/obs_95194ea7.jpg",
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 143.0px, departed at 2.6s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P001/crops/obs_683b94a9.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P002",
+    "track_id": "P002",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.0",
+    "description": "Female customer (P002) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P002/crops/obs_dc7326a1.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 32.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P002/crops/obs_41c92df5.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P003",
+    "track_id": "P003",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.0",
+    "description": "Female customer (P003) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P003/crops/obs_a3cff28a.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 3.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P003/crops/obs_3b5161ae.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P004",
+    "track_id": "P004",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.1",
+    "description": "Male suspect (P004) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P004/crops/obs_4a61fb36.jpg",
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 292.4px, departed at 10.8s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P004/crops/obs_4a61fb36.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P005",
+    "track_id": "P005",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.13",
+    "description": "Female customer (P005) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P005/crops/obs_aa670cb3.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 2.4s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P005/crops/obs_77c914f6.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P006",
+    "track_id": "P006",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.47",
+    "description": "Female customer (P006) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P006/crops/obs_bfff622b.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 2.4s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P006/crops/obs_815a423d.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P007",
+    "track_id": "P007",
+    "camera_id": "cam_auto_01",
+    "timestamp": "2.7",
+    "description": "Male suspect (P007) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P007/crops/obs_80de55d7.jpg",
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 35.1px, departed at 2.4s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P007/crops/obs_8336862b.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P008",
+    "track_id": "P008",
+    "camera_id": "cam_auto_01",
+    "timestamp": "4.2",
+    "description": "Individual (P008) present in store area.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P008/crops/obs_69c08f78.jpg",
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 2.3s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P008/crops/obs_69c08f78.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P010",
+    "track_id": "P010",
+    "camera_id": "cam_auto_01",
+    "timestamp": "8.1",
+    "description": "Female customer (P010) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P010/crops/obs_6a70dd97.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P010/crops/obs_0aad7843.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P012",
+    "track_id": "P012",
+    "camera_id": "cam_auto_01",
+    "timestamp": "11.03",
+    "description": "Female customer (P012) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P012/crops/obs_4641dd67.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 6.3s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P012/crops/obs_6c520e56.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P013",
+    "track_id": "P013",
+    "camera_id": "cam_auto_01",
+    "timestamp": "11.19",
+    "description": "Female customer (P013) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P013/crops/obs_4de0fab6.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 1.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P013/crops/obs_41d7b6b5.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P015",
+    "track_id": "P015",
+    "camera_id": "cam_auto_01",
+    "timestamp": "12.46",
+    "description": "Female customer (P015) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P015/crops/obs_f2854128.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P015/crops/obs_bb5264d8.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P016",
+    "track_id": "P016",
+    "camera_id": "cam_auto_01",
+    "timestamp": "12.96",
+    "description": "Female customer (P016) standing at display counter viewing jewelry.",
+    "bbox": [
+      0,
+      0,
+      100,
+      100
+    ],
+    "crop_url": "/media/tracks/VIDEO-2026-08-17-11-38-54.mp4/P016/crops/obs_c63517f5.jpg",
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P016/crops/obs_174fe4d0.jpg"
+    }
+  },
+  {
+    "id": "PERSON_3DA777FD",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.0",
+    "description": "Male store staff / salesman (P048) standing behind display counter showing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "salesman",
+      "behavior": "store staff/salesman standing behind display counter managing jewelry trays",
+      "location": "behind jewelry display counter",
+      "spatial_zone": "sales_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P048/crops/obs_f303f25a.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P015",
+    "camera_id": "cam_auto_01",
+    "timestamp": "12.39247572815534",
+    "description": "Female customer (P057) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P057/crops/obs_9042ab26.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4472D287",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.06666666666666667",
+    "description": "Male suspect (P001) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 143.0px, departed at 2.6s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P001/crops/obs_683b94a9.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P003",
+    "camera_id": "cam_auto_01",
+    "timestamp": "32.8",
+    "description": "Female customer (P002) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 32.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P002/crops/obs_41c92df5.jpg"
+    }
+  },
+  {
+    "id": "PERSON_BE4F4821",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.8",
+    "description": "Female customer (P003) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 3.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P003/crops/obs_3b5161ae.jpg"
+    }
+  },
+  {
+    "id": "PERSON_C1FB0B1B",
+    "camera_id": "cam_auto_01",
+    "timestamp": "0.7",
+    "description": "Female customer (P005) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 2.4s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P005/crops/obs_77c914f6.jpg"
+    }
+  },
+  {
+    "id": "PERSON_5E31B0E6",
+    "camera_id": "cam_auto_01",
+    "timestamp": "3.8666666666666667",
+    "description": "Female customer (P024) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P024/crops/obs_67d829b4.jpg"
+    }
+  },
+  {
+    "id": "PERSON_BCB38758",
+    "camera_id": "cam_auto_01",
+    "timestamp": "1.9666666666666666",
+    "description": "Male suspect (P007) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 35.1px, departed at 2.4s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P007/crops/obs_8336862b.jpg"
+    }
+  },
+  {
+    "id": "PERSON_5DCE29DC",
+    "camera_id": "cam_auto_01",
+    "timestamp": "3.7666666666666666",
+    "description": "Female customer (P010) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P010/crops/obs_0aad7843.jpg"
+    }
+  },
+  {
+    "id": "PERSON_5DCE29DC",
+    "camera_id": "cam_auto_01",
+    "timestamp": "3.8666666666666667",
+    "description": "Female customer (P010) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P010/crops/obs_0aad7843.jpg"
+    }
+  },
+  {
+    "id": "PERSON_56FC3CCB",
+    "camera_id": "cam_auto_01",
+    "timestamp": "5.066666666666666",
+    "description": "Male suspect (P011) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 37.2px, departed at 6.6s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P011/crops/obs_779b2570.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4A96F277",
+    "camera_id": "cam_auto_01",
+    "timestamp": "5.633333333333334",
+    "description": "Female customer (P083) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P083/crops/obs_a1251947.jpg"
+    }
+  },
+  {
+    "id": "PERSON_114960CE",
+    "camera_id": "cam_auto_01",
+    "timestamp": "18.666666666666668",
+    "description": "Female customer (P014) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 14.2s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P014/crops/obs_13f41d8c.jpg"
+    }
+  },
+  {
+    "id": "PERSON_5E31B0E6",
+    "camera_id": "cam_auto_01",
+    "timestamp": "5.766666666666667",
+    "description": "Female customer (P024) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P024/crops/obs_67d829b4.jpg"
+    }
+  },
+  {
+    "id": "PERSON_87186B6C",
+    "camera_id": "cam_auto_01",
+    "timestamp": "7.266666666666667",
+    "description": "Female customer (P016) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P016/crops/obs_174fe4d0.jpg"
+    }
+  },
+  {
+    "id": "PERSON_28BB12C5",
+    "camera_id": "cam_auto_01",
+    "timestamp": "12.233333333333333",
+    "description": "Male suspect (P017) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 213.6px, departed at 14.8s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P017/crops/obs_2535b3ae.jpg"
+    }
+  },
+  {
+    "id": "PERSON_A8A6A057",
+    "camera_id": "cam_auto_01",
+    "timestamp": "9.266666666666667",
+    "description": "Female customer (P018) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P018/crops/obs_e5c2917e.jpg"
+    }
+  },
+  {
+    "id": "PERSON_5E31B0E6",
+    "camera_id": "cam_auto_01",
+    "timestamp": "13.0",
+    "description": "Female customer (P024) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P024/crops/obs_67d829b4.jpg"
+    }
+  },
+  {
+    "id": "PERSON_AC9DC9DB",
+    "camera_id": "cam_auto_01",
+    "timestamp": "14.066666666666666",
+    "description": "Male suspect (P021) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 302.1px, departed at 48.8s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P021/crops/obs_7d71f302.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4A96F277",
+    "camera_id": "cam_auto_01",
+    "timestamp": "13.6",
+    "description": "Female customer (P083) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P083/crops/obs_a1251947.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4C0491F4",
+    "camera_id": "cam_auto_01",
+    "timestamp": "16.033333333333335",
+    "description": "Male suspect (P023) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 201.4px, departed at 18.1s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P023/crops/obs_9c2ab71a.jpg"
+    }
+  },
+  {
+    "id": "PERSON_5E31B0E6",
+    "camera_id": "cam_auto_01",
+    "timestamp": "16.266666666666666",
+    "description": "Female customer (P024) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P024/crops/obs_67d829b4.jpg"
+    }
+  },
+  {
+    "id": "PERSON_B53DB7A1",
+    "camera_id": "cam_auto_01",
+    "timestamp": "26.0",
+    "description": "Female customer (P028) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 15.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P028/crops/obs_9f057b82.jpg"
+    }
+  },
+  {
+    "id": "PERSON_AB2BDF43",
+    "camera_id": "cam_auto_01",
+    "timestamp": "27.166666666666668",
+    "description": "Male suspect (P030) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 139.4px, departed at 27.8s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P030/crops/obs_19bf1411.jpg"
+    }
+  },
+  {
+    "id": "PERSON_56EA3795",
+    "camera_id": "cam_auto_01",
+    "timestamp": "28.1",
+    "description": "Individual (P031) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 27.3s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P031/crops/obs_abdc9273.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4A96F277",
+    "camera_id": "cam_auto_01",
+    "timestamp": "30.333333333333332",
+    "description": "Female customer (P083) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P083/crops/obs_a1251947.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4A96F277",
+    "camera_id": "cam_auto_01",
+    "timestamp": "34.9",
+    "description": "Female customer (P083) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P083/crops/obs_a1251947.jpg"
+    }
+  },
+  {
+    "id": "PERSON_CD166727",
+    "camera_id": "cam_auto_01",
+    "timestamp": "43.06666666666667",
+    "description": "Female customer (P035) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 7.8s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P035/crops/obs_f4b6bd5c.jpg"
+    }
+  },
+  {
+    "id": "PERSON_B93F86E0",
+    "camera_id": "cam_auto_01",
+    "timestamp": "40.4",
+    "description": "Female customer (P036) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 11.6s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P036/crops/obs_e3d77620.jpg"
+    }
+  },
+  {
+    "id": "PERSON_2E83E035",
+    "camera_id": "cam_auto_01",
+    "timestamp": "40.733333333333334",
+    "description": "Female customer (P037) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 1.1s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P037/crops/obs_3b53a578.jpg"
+    }
+  },
+  {
+    "id": "PERSON_46574F6A",
+    "camera_id": "cam_auto_01",
+    "timestamp": "45.4",
+    "description": "Female customer (P040) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P040/crops/obs_fe7a10d0.jpg"
+    }
+  },
+  {
+    "id": "PERSON_46574F6A",
+    "camera_id": "cam_auto_01",
+    "timestamp": "46.7",
+    "description": "Female customer (P040) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P040/crops/obs_fe7a10d0.jpg"
+    }
+  },
+  {
+    "id": "PERSON_60920A0A",
+    "camera_id": "cam_auto_01",
+    "timestamp": "56.46666666666667",
+    "description": "Female customer (P041) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 26.8s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P041/crops/obs_197b6ba9.jpg"
+    }
+  },
+  {
+    "id": "PERSON_55E4D644",
+    "camera_id": "cam_auto_01",
+    "timestamp": "48.6",
+    "description": "Female customer (P042) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P042/crops/obs_dff29154.jpg"
+    }
+  },
+  {
+    "id": "PERSON_B4065CF6",
+    "camera_id": "cam_auto_01",
+    "timestamp": "51.0",
+    "description": "Individual (P043) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 2.4s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P043/crops/obs_8d64e4e6.jpg"
+    }
+  },
+  {
+    "id": "PERSON_74060184",
+    "camera_id": "cam_auto_01",
+    "timestamp": "49.93333333333333",
+    "description": "Female customer (P044) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P044/crops/obs_6b363eaf.jpg"
+    }
+  },
+  {
+    "id": "PERSON_3DA777FD",
+    "camera_id": "cam_auto_01",
+    "timestamp": "50.03333333333333",
+    "description": "Male store staff / salesman (P048) standing behind display counter showing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "salesman",
+      "behavior": "store staff/salesman standing behind display counter managing jewelry trays",
+      "location": "behind jewelry display counter",
+      "spatial_zone": "sales_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P048/crops/obs_f303f25a.jpg"
+    }
+  },
+  {
+    "id": "PERSON_EACA7AFE",
+    "camera_id": "cam_auto_01",
+    "timestamp": "50.1",
+    "description": "Female customer (P047) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 19.4s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P047/crops/obs_35c1a412.jpg"
+    }
+  },
+  {
+    "id": "PERSON_3DA777FD",
+    "camera_id": "cam_auto_01",
+    "timestamp": "52.93333333333333",
+    "description": "Male store staff / salesman (P048) standing behind display counter showing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "salesman",
+      "behavior": "store staff/salesman standing behind display counter managing jewelry trays",
+      "location": "behind jewelry display counter",
+      "spatial_zone": "sales_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P048/crops/obs_f303f25a.jpg"
+    }
+  },
+  {
+    "id": "PERSON_7314612A",
+    "camera_id": "cam_auto_01",
+    "timestamp": "55.266666666666666",
+    "description": "Male suspect (P050) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 286.8px, departed at 67.8s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P050/crops/obs_7691abae.jpg"
+    }
+  },
+  {
+    "id": "PERSON_68CD2635",
+    "camera_id": "cam_auto_01",
+    "timestamp": "56.53333333333333",
+    "description": "Male store staff / salesman (P051) standing behind display counter showing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "salesman",
+      "behavior": "store staff/salesman standing behind display counter managing jewelry trays",
+      "location": "behind jewelry display counter",
+      "spatial_zone": "sales_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P051/crops/obs_7c1be668.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P006",
+    "camera_id": "cam_auto_01",
+    "timestamp": "57.833333333333336",
+    "description": "Female customer (P052) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P052/crops/obs_16bae59f.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P007",
+    "camera_id": "cam_auto_01",
+    "timestamp": "59.7",
+    "description": "Female customer (P054) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P054/crops/obs_25691859.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P012",
+    "camera_id": "cam_auto_01",
+    "timestamp": "67.23333333333333",
+    "description": "Female customer (P056) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 7.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P056/crops/obs_fa0e60fb.jpg"
+    }
+  },
+  {
+    "id": "PERSON_P015",
+    "camera_id": "cam_auto_01",
+    "timestamp": "69.26666666666667",
+    "description": "Female customer (P057) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P057/crops/obs_9042ab26.jpg"
+    }
+  },
+  {
+    "id": "PERSON_BA551466",
+    "camera_id": "cam_auto_01",
+    "timestamp": "78.83333333333333",
+    "description": "Female customer (P058) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 29.1s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P058/crops/obs_2d2903de.jpg"
+    }
+  },
+  {
+    "id": "PERSON_C4A783DB",
+    "camera_id": "cam_auto_01",
+    "timestamp": "71.2",
+    "description": "Female customer (P059) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 1.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P059/crops/obs_0e38b849.jpg"
+    }
+  },
+  {
+    "id": "PERSON_8642E886",
+    "camera_id": "cam_auto_01",
+    "timestamp": "71.13333333333334",
+    "description": "Individual (P060) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 0.5s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P060/crops/obs_86a9b203.jpg"
+    }
+  },
+  {
+    "id": "PERSON_8F7DCA3B",
+    "camera_id": "cam_auto_01",
+    "timestamp": "74.0",
+    "description": "Individual (P061) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 1.7s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P061/crops/obs_882af219.jpg"
+    }
+  },
+  {
+    "id": "PERSON_FC6CB13A",
+    "camera_id": "cam_auto_01",
+    "timestamp": "74.9",
+    "description": "Female customer (P062) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 1.3s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P062/crops/obs_c5bdbcfa.jpg"
+    }
+  },
+  {
+    "id": "PERSON_C1D99241",
+    "camera_id": "cam_auto_01",
+    "timestamp": "80.03333333333333",
+    "description": "Individual (P063) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 3.9s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P063/crops/obs_9993ffee.jpg"
+    }
+  },
+  {
+    "id": "PERSON_6D1FF5A4",
+    "camera_id": "cam_auto_01",
+    "timestamp": "76.6",
+    "description": "Female customer (P066) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P066/crops/obs_beade0d9.jpg"
+    }
+  },
+  {
+    "id": "PERSON_3D5BBCCC",
+    "camera_id": "cam_auto_01",
+    "timestamp": "77.1",
+    "description": "Female customer (P067) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P067/crops/obs_ba116ba8.jpg"
+    }
+  },
+  {
+    "id": "PERSON_7831A975",
+    "camera_id": "cam_auto_01",
+    "timestamp": "81.3",
+    "description": "Female customer (P068) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 2.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P068/crops/obs_0b9b72a6.jpg"
+    }
+  },
+  {
+    "id": "PERSON_68EB04C3",
+    "camera_id": "cam_auto_01",
+    "timestamp": "81.56666666666666",
+    "description": "Male suspect (P072) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 159.1px, departed at 83.0s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P072/crops/obs_9d1cc99b.jpg"
+    }
+  },
+  {
+    "id": "PERSON_81986CA6",
+    "camera_id": "cam_auto_01",
+    "timestamp": "81.96666666666667",
+    "description": "Female customer (P073) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.9s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P073/crops/obs_3940a10b.jpg"
+    }
+  },
+  {
+    "id": "PERSON_A6C59CE1",
+    "camera_id": "cam_auto_01",
+    "timestamp": "82.16666666666667",
+    "description": "Female customer (P074) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P074/crops/obs_9b83e1f8.jpg"
+    }
+  },
+  {
+    "id": "PERSON_CCA4D591",
+    "camera_id": "cam_auto_01",
+    "timestamp": "86.33333333333333",
+    "description": "Individual (P076) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 6.4s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P076/crops/obs_101541bb.jpg"
+    }
+  },
+  {
+    "id": "PERSON_88BA870D",
+    "camera_id": "cam_auto_01",
+    "timestamp": "84.23333333333333",
+    "description": "Male suspect (P077) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 102.0px, departed at 90.2s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P077/crops/obs_04a3d6b1.jpg"
+    }
+  },
+  {
+    "id": "PERSON_DCEACF6A",
+    "camera_id": "cam_auto_01",
+    "timestamp": "84.73333333333333",
+    "description": "Female customer (P079) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P079/crops/obs_974dbb79.jpg"
+    }
+  },
+  {
+    "id": "PERSON_CFAD4AA7",
+    "camera_id": "cam_auto_01",
+    "timestamp": "100.1",
+    "description": "Female customer (P093) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 15.3s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P093/crops/obs_3cf83831.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4A96F277",
+    "camera_id": "cam_auto_01",
+    "timestamp": "92.0",
+    "description": "Female customer (P083) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P083/crops/obs_a1251947.jpg"
+    }
+  },
+  {
+    "id": "PERSON_BA9B1243",
+    "camera_id": "cam_auto_01",
+    "timestamp": "94.7",
+    "description": "Individual (P090) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 0.8s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P090/crops/obs_e4765d0c.jpg"
+    }
+  },
+  {
+    "id": "PERSON_A3E614B1",
+    "camera_id": "cam_auto_01",
+    "timestamp": "95.6",
+    "description": "Female customer (P087) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P087/crops/obs_042c5e5e.jpg"
+    }
+  },
+  {
+    "id": "PERSON_44758356",
+    "camera_id": "cam_auto_01",
+    "timestamp": "104.96666666666667",
+    "description": "Female customer (P088) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 8.8s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P088/crops/obs_f3480515.jpg"
+    }
+  },
+  {
+    "id": "PERSON_5E877758",
+    "camera_id": "cam_auto_01",
+    "timestamp": "98.36666666666666",
+    "description": "Female customer (P089) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 1.4s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P089/crops/obs_f1cab2c9.jpg"
+    }
+  },
+  {
+    "id": "PERSON_BA9B1243",
+    "camera_id": "cam_auto_01",
+    "timestamp": "97.1",
+    "description": "Individual (P090) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 0.8s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P090/crops/obs_e4765d0c.jpg"
+    }
+  },
+  {
+    "id": "PERSON_D0AC60FD",
+    "camera_id": "cam_auto_01",
+    "timestamp": "98.36666666666666",
+    "description": "Female customer (P091) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P091/crops/obs_9e3345a2.jpg"
+    }
+  },
+  {
+    "id": "PERSON_6E5FD99D",
+    "camera_id": "cam_auto_01",
+    "timestamp": "101.23333333333333",
+    "description": "Female customer (P092) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P092/crops/obs_dc015193.jpg"
+    }
+  },
+  {
+    "id": "PERSON_CFAD4AA7",
+    "camera_id": "cam_auto_01",
+    "timestamp": "108.0",
+    "description": "Female customer (P093) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 15.3s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P093/crops/obs_3cf83831.jpg"
+    }
+  },
+  {
+    "id": "PERSON_2DEA5418",
+    "camera_id": "cam_auto_01",
+    "timestamp": "106.0",
+    "description": "Female customer (P094) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P094/crops/obs_eef617de.jpg"
+    }
+  },
+  {
+    "id": "PERSON_4C73A39D",
+    "camera_id": "cam_auto_01",
+    "timestamp": "112.03333333333333",
+    "description": "Male store staff / salesman (P097) standing behind display counter showing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "salesman",
+      "behavior": "store staff/salesman standing behind display counter managing jewelry trays",
+      "location": "behind jewelry display counter",
+      "spatial_zone": "sales_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P097/crops/obs_c615bb11.jpg"
+    }
+  },
+  {
+    "id": "PERSON_C5C69CDB",
+    "camera_id": "cam_auto_01",
+    "timestamp": "114.03333333333333",
+    "description": "Male suspect (P098) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 276.6px, departed at 122.0s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P098/crops/obs_d5ef3885.jpg"
+    }
+  },
+  {
+    "id": "PERSON_D2C89F8F",
+    "camera_id": "cam_auto_01",
+    "timestamp": "114.1",
+    "description": "Female customer (P099) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P099/crops/obs_c5eb1656.jpg"
+    }
+  },
+  {
+    "id": "PERSON_1D53AEBF",
+    "camera_id": "cam_auto_01",
+    "timestamp": "115.36666666666666",
+    "description": "Female customer (P100) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P100/crops/obs_abf8dc21.jpg"
+    }
+  },
+  {
+    "id": "PERSON_F4092733",
+    "camera_id": "cam_auto_01",
+    "timestamp": "116.23333333333333",
+    "description": "Female customer (P101) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 5.0s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P101/crops/obs_3355946e.jpg"
+    }
+  },
+  {
+    "id": "PERSON_27CD6115",
+    "camera_id": "cam_auto_01",
+    "timestamp": "116.96666666666667",
+    "description": "Female customer (P102) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P102/crops/obs_091734d7.jpg"
+    }
+  },
+  {
+    "id": "PERSON_B59924DD",
+    "camera_id": "cam_auto_01",
+    "timestamp": "118.43333333333334",
+    "description": "Individual (P103) present in store area.",
+    "bbox": null,
+    "attributes": {
+      "gender": "individual",
+      "role": "customer",
+      "behavior": "present in store area (duration: 1.7s)",
+      "location": "store area",
+      "spatial_zone": "store_area",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P103/crops/obs_4e5f7de6.jpg"
+    }
+  },
+  {
+    "id": "PERSON_CF989714",
+    "camera_id": "cam_auto_01",
+    "timestamp": "120.36666666666666",
+    "description": "Male suspect (P105) standing at customer counter who snatched gold chain and fled towards exit.",
+    "bbox": null,
+    "attributes": {
+      "gender": "male",
+      "role": "suspect",
+      "behavior": "standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 122.3px, departed at 122.0s)",
+      "location": "front customer counter / entrance zone",
+      "spatial_zone": "front_customer_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P105/crops/obs_11c942df.jpg"
+    }
+  },
+  {
+    "id": "PERSON_476264B9",
+    "camera_id": "cam_auto_01",
+    "timestamp": "121.56666666666666",
+    "description": "Female customer (P106) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 1.0s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P106/crops/obs_18374958.jpg"
+    }
+  },
+  {
+    "id": "PERSON_9651EF63",
+    "camera_id": "cam_auto_01",
+    "timestamp": "122.03333333333333",
+    "description": "Female customer (P107) standing at display counter viewing jewelry.",
+    "bbox": null,
+    "attributes": {
+      "gender": "female",
+      "role": "customer",
+      "behavior": "female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s)",
+      "location": "at display counter",
+      "spatial_zone": "display_counter",
+      "crop_url": "/media/tracks/VIDEO-2026-08-17-13-56-07.mp4/P107/crops/obs_a6b6e64a.jpg"
+    }
+  }
+]
