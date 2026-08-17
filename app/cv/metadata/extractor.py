@@ -201,7 +201,7 @@ class AutoVideoMetadataExtractor:
                     crop_path_relative = f"/media/{best_jpg.relative_to('dataset')}"
                     break
 
-        description = f"Individual ({track_id}) {behavior}."
+        # Maintain rich demographic description
 
         return {
             "track_id": track_id,

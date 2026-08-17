@@ -4,7 +4,7 @@
     "track_id": "P001",
     "camera_id": "cam_auto_01",
     "timestamp": "0.0",
-    "description": "Individual (P001) store staff/salesman standing behind display counter managing jewelry trays.",
+    "description": "Male store staff / salesman (P001) standing behind display counter showing jewelry.",
     "bbox": [
       0,
       0,
@@ -26,7 +26,7 @@
     "track_id": "P002",
     "camera_id": "cam_auto_01",
     "timestamp": "0.0",
-    "description": "Individual (P002) female customer standing at counter viewing jewelry / on mobile phone (duration: 13.7s).",
+    "description": "Female customer (P002) standing at display counter viewing jewelry.",
     "bbox": [
       0,
       0,
@@ -48,7 +48,7 @@
     "track_id": "P003",
     "camera_id": "cam_auto_01",
     "timestamp": "0.0",
-    "description": "Individual (P003) female customer standing at counter viewing jewelry / on mobile phone (duration: 13.5s).",
+    "description": "Female customer (P003) standing at display counter viewing jewelry.",
     "bbox": [
       0,
       0,
@@ -70,7 +70,7 @@
     "track_id": "P004",
     "camera_id": "cam_auto_01",
     "timestamp": "0.1",
-    "description": "Individual (P004) standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: 292.4px, departed at 10.8s).",
+    "description": "Male suspect (P004) standing at customer counter who snatched gold chain and fled towards exit.",
     "bbox": [
       0,
       0,
@@ -92,7 +92,7 @@
     "track_id": "P005",
     "camera_id": "cam_auto_01",
     "timestamp": "0.13",
-    "description": "Individual (P005) present in store area (duration: 3.0s).",
+    "description": "Individual (P005) present in store area.",
     "bbox": [
       0,
       0,
@@ -114,7 +114,7 @@
     "track_id": "P006",
     "camera_id": "cam_auto_01",
     "timestamp": "0.47",
-    "description": "Individual (P006) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.6s).",
+    "description": "Female customer (P006) standing at display counter viewing jewelry.",
     "bbox": [
       0,
       0,
@@ -136,7 +136,7 @@
     "track_id": "P007",
     "camera_id": "cam_auto_01",
     "timestamp": "2.7",
-    "description": "Individual (P007) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s).",
+    "description": "Female customer (P007) standing at display counter viewing jewelry.",
     "bbox": [
       0,
       0,
@@ -158,7 +158,7 @@
     "track_id": "P008",
     "camera_id": "cam_auto_01",
     "timestamp": "4.2",
-    "description": "Individual (P008) present in store area (duration: 2.3s).",
+    "description": "Individual (P008) present in store area.",
     "bbox": [
       0,
       0,
@@ -180,7 +180,7 @@
     "track_id": "P010",
     "camera_id": "cam_auto_01",
     "timestamp": "8.1",
-    "description": "Individual (P010) present in store area (duration: 1.7s).",
+    "description": "Individual (P010) present in store area.",
     "bbox": [
       0,
       0,
@@ -202,7 +202,7 @@
     "track_id": "P012",
     "camera_id": "cam_auto_01",
     "timestamp": "11.03",
-    "description": "Individual (P012) female customer standing at counter viewing jewelry / on mobile phone (duration: 2.7s).",
+    "description": "Female customer (P012) standing at display counter viewing jewelry.",
     "bbox": [
       0,
       0,
@@ -224,7 +224,7 @@
     "track_id": "P013",
     "camera_id": "cam_auto_01",
     "timestamp": "11.19",
-    "description": "Individual (P013) present in store area (duration: 1.1s).",
+    "description": "Individual (P013) present in store area.",
     "bbox": [
       0,
       0,
@@ -246,7 +246,7 @@
     "track_id": "P015",
     "camera_id": "cam_auto_01",
     "timestamp": "12.46",
-    "description": "Individual (P015) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.5s).",
+    "description": "Female customer (P015) standing at display counter viewing jewelry.",
     "bbox": [
       0,
       0,
@@ -268,7 +268,7 @@
     "track_id": "P016",
     "camera_id": "cam_auto_01",
     "timestamp": "12.96",
-    "description": "Individual (P016) female customer standing at counter viewing jewelry / on mobile phone (duration: 0.7s).",
+    "description": "Female customer (P016) standing at display counter viewing jewelry.",
     "bbox": [
       0,
       0,

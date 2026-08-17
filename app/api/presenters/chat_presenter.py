@@ -256,25 +256,30 @@ class ChatPresenter:
             p_id, crop_url, raw_ts, clip_url = resolve_details_for_evidence(e)
             norm_pid = str(p_id) if p_id else None
             
+            # Normalize PID representation (e.g. P_P004 -> P_004 or P004)
+            clean_pid = norm_pid.replace("P_P", "P") if norm_pid else None
+            
             # Deduplicate by person_id to prevent duplicate cards for the same person
-            if norm_pid and norm_pid in seen_pids:
+            if clean_pid and clean_pid in seen_pids:
                 continue
-            if norm_pid:
-                seen_pids.add(norm_pid)
+            if clean_pid:
+                seen_pids.add(clean_pid)
 
-            # Strict Target Filtering dynamically from evidence metadata
+            # Strict Target Filtering dynamically from evidence metadata with word boundaries
             meta = e.get("metadata") or {}
             ev_desc = str(e.get("description") or meta.get("description") or "").lower()
             ev_gender = str(meta.get("gender") or "").lower()
             ev_role = str(meta.get("role") or "").lower()
-            is_female = ev_gender == "female" or "female" in ev_desc or "woman" in ev_desc
-            is_suspect = ev_role == "suspect" or "suspect" in ev_desc or "snatch" in ev_desc or "flee" in ev_desc
+            
+            is_female = ev_gender == "female" or re.search(r'\b(female|woman|women|lady|girl)\b', ev_desc) is not None
+            is_male = (ev_gender == "male" or re.search(r'\b(male|man|men|salesman|suspect|gentleman|boy|guy)\b', ev_desc) is not None) and not is_female
+            is_suspect = ev_role == "suspect" or re.search(r'\b(suspect|snatch|thief|robber|culprit|fled|fleeing)\b', ev_desc) is not None
 
             if is_suspect_query and not is_suspect:
                 continue
             if is_women_query and not is_female:
                 continue
-            if is_men_query and is_female:
+            if is_men_query and not is_male:
                 continue
 
             # Discard non-human/false tracks with no valid crop
