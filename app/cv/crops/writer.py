@@ -54,8 +54,10 @@ class TrackWriter:
         h, w = frame_bgr.shape[:2]
         x1, y1, x2, y2 = self._clamp_bbox(bbox, w, h)
         
-        # Ensure valid crop area
-        if x2 > x1 and y2 > y1:
+        # Ensure valid crop area (minimum 24x48 to avoid writing empty/degenerate artifacts)
+        crop_w = x2 - x1
+        crop_h = y2 - y1
+        if crop_w >= 24 and crop_h >= 48:
             crop = frame_bgr[y1:y2, x1:x2]
             crop_rel_path = f"crops/{evidence_id}.jpg"
             crop_abs_path = track_dir / crop_rel_path
@@ -65,7 +67,7 @@ class TrackWriter:
                 logger.warning(f"Failed to write crop {crop_abs_path}: {e}")
                 crop_rel_path = ""
         else:
-            logger.warning(f"Invalid bounding box {bbox} for track {track_id}")
+            # Degenerate or clipped bbox
             crop_rel_path = ""
 
         # 2. Update track.json

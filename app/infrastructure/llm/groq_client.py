@@ -39,10 +39,10 @@ class GroqLLMClient(BaseLLMClient):
     """
 
     def __init__(self, model: str | None = None, api_key: str | None = None):
-        self.model = model or os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
+        self.model = model or os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
         self.api_key = api_key or os.getenv("GROQ_API_KEY", "")
         self.base_url = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
-        self.timeout = int(os.getenv("GROQ_TIMEOUT", "60"))
+        self.timeout = int(os.getenv("GROQ_TIMEOUT", "10"))
 
     async def generate(self, request: LLMRequest, **kwargs) -> LLMResponse:
         """Invoke Groq chat completions API."""

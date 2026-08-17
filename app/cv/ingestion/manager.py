@@ -92,7 +92,7 @@ class IngestionManager:
             fallback_obs = None
             fallback_score = -1.0
 
-            # Evaluate up to 10 representative crops per track for maximum efficiency
+            # Evaluate representative crops per track with strict quality gating & deduplication
             approved_crops = []
             for obs in observations:
                 import os
@@ -111,27 +111,31 @@ class IngestionManager:
                         if os.path.exists(crop_path):
                             crop_bgr = cv2.imread(crop_path)
                             if crop_bgr is not None:
-                                h, w = crop_bgr.shape[:2]
                                 quality = self.quality_selector.assess_quality(crop_bgr)
                                 score = float(quality.get("score", 0))
                                 if quality.get("approved"):
-                                    approved_crops.append((score, crop_bgr, obs, evidence_id))
-                                    if score > best_quality:
-                                        best_quality = score
-                                        best_crop = crop_bgr
-                                        best_obs = obs
-                                if (h * w) > fallback_score:
-                                    fallback_score = float(h * w)
+                                    # Deduplication: avoid adding duplicate viewpoints for the same track
+                                    is_dup = any(
+                                        self.quality_selector.are_duplicate_crops(crop_bgr, prev[1])
+                                        for prev in approved_crops
+                                    )
+                                    if not is_dup:
+                                        approved_crops.append((score, crop_bgr, obs, evidence_id))
+                                        if score > best_quality:
+                                            best_quality = score
+                                            best_crop = crop_bgr
+                                            best_obs = obs
+                                if (crop_bgr.shape[0] * crop_bgr.shape[1]) > fallback_score:
+                                    fallback_score = float(crop_bgr.shape[0] * crop_bgr.shape[1])
                                     fallback_crop = crop_bgr
                                     fallback_obs = obs
                                     fallback_ev_id = evidence_id
                             break
                                 
-            # If no approved crop, use fallback best-sized crop
+            # If no crop strictly passed the quality threshold, use fallback only for embedding if non-empty, but DO NOT save to person gallery
             if best_crop is None and fallback_crop is not None:
                 best_crop = fallback_crop
                 best_obs = fallback_obs
-                approved_crops.append((fallback_score, fallback_crop, fallback_obs, fallback_ev_id))
                                 
             if best_crop is not None and best_obs is not None:
                 # 3. OSNet Extractor
@@ -179,8 +183,8 @@ class IngestionManager:
                     logger.warning(f"Ambiguous identity for tracklet {track_id}, preserving UNRESOLVED.")
                     final_id = f"UNRESOLVED_{track_id}"
                 
-                # Copy 5 to 10 enhanced quality crops into canonical person gallery if resolved
-                if not final_id.startswith("UNRESOLVED"):
+                # Copy ONLY high-quality, deduplicated, enhanced crops into canonical person gallery if resolved
+                if not final_id.startswith("UNRESOLVED") and approved_crops:
                     import json
                     from pathlib import Path
                     from app.cv.crops.enhancer import CropEnhancer
@@ -189,18 +193,32 @@ class IngestionManager:
                     canonical_dir = Path("dataset") / "persons" / final_id
                     canonical_crops_dir = canonical_dir / "crops"
                     canonical_crops_dir.mkdir(parents=True, exist_ok=True)
+
+                    # Read existing gallery images to prevent cross-track duplicates
+                    existing_crops = []
+                    for existing_path in canonical_crops_dir.glob("*.jpg"):
+                        ex_bgr = cv2.imread(str(existing_path))
+                        if ex_bgr is not None:
+                            existing_crops.append(ex_bgr)
                     
-                    # Sort approved crops by quality score descending, keep top 5-10
+                    # Sort approved crops by quality score descending, keep top 4-6 distinct crops
                     approved_crops.sort(key=lambda x: x[0], reverse=True)
-                    top_crops_to_save = approved_crops[:8]
                     
                     saved_ev_ids = []
-                    for _, c_img, _, c_ev_id in top_crops_to_save:
+                    for _, c_img, _, c_ev_id in approved_crops:
+                        if len(saved_ev_ids) + len(existing_crops) >= 5:
+                            break
                         if c_img is not None and c_ev_id:
-                            enhanced_img = enhancer.enhance(c_img)
-                            canonical_crop_path = canonical_crops_dir / f"{c_ev_id}.jpg"
-                            cv2.imwrite(str(canonical_crop_path), enhanced_img)
-                            saved_ev_ids.append(str(c_ev_id))
+                            is_dup = any(
+                                self.quality_selector.are_duplicate_crops(c_img, ex)
+                                for ex in existing_crops
+                            )
+                            if not is_dup:
+                                enhanced_img = enhancer.enhance(c_img)
+                                canonical_crop_path = canonical_crops_dir / f"{c_ev_id}.jpg"
+                                cv2.imwrite(str(canonical_crop_path), enhanced_img)
+                                saved_ev_ids.append(str(c_ev_id))
+                                existing_crops.append(c_img)
 
                     # Maintain person metadata
                     person_meta_file = canonical_dir / "person.json"
