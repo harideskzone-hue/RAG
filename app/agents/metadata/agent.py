@@ -79,9 +79,119 @@ class MetadataAgent(BaseAgent):
                 else:
                     result.cameras = await self.service.get_all_cameras(context)
 
-            elif intent in [Intent.EVENT_SEARCH.value, Intent.REPORT.value, Intent.PERSON_SEARCH.value, "PERSON_SEARCH", "REPORT"]:
+            elif intent in [Intent.EVENT_SEARCH.value, Intent.REPORT.value, Intent.PERSON_SEARCH.value, Intent.BEHAVIORAL_INVESTIGATION.value, "PERSON_SEARCH", "REPORT", "BEHAVIORAL_INVESTIGATION", "COUNT", "LIST"]:
                 # Fetch recent alerts
                 result.alerts = await self.service.get_recent_alerts(limit=50, context=context)
+                
+                # 1. First priority: Load from auto-generated video metadata JSON file
+                from pathlib import Path
+                import json
+                
+                loaded_from_json = False
+                active_vid = getattr(context, "active_video_id", None)
+                meta_json_candidates = []
+                if active_vid:
+                    meta_json_candidates.extend([
+                        Path(f"dataset/metadata/{active_vid}.json"),
+                        Path(f"dataset/tracks/{active_vid}/metadata.json"),
+                        Path(f"dataset/metadata/{Path(active_vid).name}.json")
+                    ])
+                
+                # Scan all available metadata JSON files on disk
+                if Path("dataset/metadata").exists():
+                    for mf in Path("dataset/metadata").glob("*.json"):
+                        if mf not in meta_json_candidates:
+                            meta_json_candidates.append(mf)
+                if Path("dataset/tracks").exists():
+                    for tf in Path("dataset/tracks").glob("*/metadata.json"):
+                        if tf not in meta_json_candidates:
+                            meta_json_candidates.append(tf)
+                
+                for j_path in meta_json_candidates:
+                    if j_path.exists():
+                        try:
+                            with open(j_path, "r") as jf:
+                                meta_doc = json.load(jf)
+                            tracks_data = meta_doc.get("tracks", [])
+                            for t in tracks_data:
+                                desc = t.get("description", "Person observed in CCTV footage.")
+                                behavior = t.get("behavior")
+                                if behavior and behavior not in desc:
+                                    desc += f" (Activity: {behavior})"
+                                result.evidence.append(MetadataEvidence(
+                                    evidence_type=EvidenceType.METADATA,
+                                    source="video_analysis",
+                                    confidence=0.95,
+                                    timestamp=datetime.now(timezone.utc),
+                                    trace_id=context.execution_id,
+                                    metadata={
+                                        "camera_id": meta_doc.get("camera_id", "cam_auto_01"),
+                                        "canonical_person_id": t.get("canonical_person_id"),
+                                        "track_id": t.get("track_id"),
+                                        "timestamp": t.get("start_time_sec", 0.0),
+                                        "video_id": meta_doc.get("video_id", j_path.stem),
+                                        "description": desc,
+                                        "behavior": t.get("behavior"),
+                                        "gender": t.get("gender"),
+                                        "location": t.get("location"),
+                                        "crop_url": t.get("crop_url"),
+                                        "origin": {
+                                            "type": "video_analysis",
+                                            "camera_id": meta_doc.get("camera_id", "cam_auto_01"),
+                                            "video_id": meta_doc.get("video_id", j_path.stem),
+                                            "track_id": t.get("track_id"),
+                                            "timestamp_sec": t.get("start_time_sec", 0.0)
+                                        }
+                                    }
+                                ))
+                            if tracks_data:
+                                loaded_from_json = True
+                        except Exception as j_err:
+                            pass
+
+                # 2. Second priority: Query MongoDB observations and events if not loaded from JSON
+                if not loaded_from_json:
+                    try:
+                        from pymongo import MongoClient
+                        from app.config.db import db_settings
+                        mc = MongoClient(db_settings.MONGO_URI)
+                        db = mc[db_settings.MONGO_DB_NAME]
+                        
+                        obs_list = list(db['observations'].find().limit(50))
+                        for obs in obs_list:
+                            desc = obs.get("description", "Person observed in CCTV footage.")
+                            behavior = obs.get("behavior")
+                            if behavior and behavior not in desc:
+                                desc += f" (Activity: {behavior})"
+                            result.evidence.append(MetadataEvidence(
+                                evidence_type=EvidenceType.METADATA,
+                                source="video_analysis",
+                                confidence=0.95,
+                                timestamp=datetime.now(timezone.utc),
+                                trace_id=context.execution_id,
+                                metadata={
+                                    "camera_id": obs.get("camera_id", "cam_auto_01"),
+                                    "canonical_person_id": obs.get("canonical_person_id"),
+                                    "track_id": obs.get("original_track_id"),
+                                    "timestamp": obs.get("timestamp"),
+                                    "video_id": obs.get("video_id", "unknown"),
+                                    "description": desc,
+                                    "behavior": obs.get("behavior"),
+                                    "gender": obs.get("gender"),
+                                    "location": obs.get("location"),
+                                    "crop_url": obs.get("crop_url"),
+                                    "origin": {
+                                        "type": "video_analysis",
+                                        "camera_id": obs.get("camera_id", "cam_auto_01"),
+                                        "video_id": obs.get("video_id", "unknown"),
+                                        "track_id": obs.get("original_track_id"),
+                                        "timestamp_sec": obs.get("timestamp")
+                                    }
+                                }
+                            ))
+                        mc.close()
+                    except Exception as ex:
+                        pass
 
             self._last_execution_time = (time.time() - start_time) * 1000
             result.execution.duration_ms = self._last_execution_time

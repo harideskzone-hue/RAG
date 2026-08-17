@@ -137,30 +137,43 @@ class VideoAgent(BaseAgent):
                     raise ValueError("No camera_id found in EvidenceBundle or upstream agents to analyze.")
 
             # Map back to Evidence (so it can be consumed by the next Reasoning step, e.g. Event Agent)
+            # Enhance evidence mapping for behavioral investigation
+            behavioral_activities = []
+            if reasoning_context.evidence_bundle and reasoning_context.evidence_bundle.evidence:
+                for ev in reasoning_context.evidence_bundle.evidence:
+                    desc = str(ev.metadata.get("description", ""))
+                    if "reach" in desc.lower() or "display case" in desc.lower() or "counter" in desc.lower() or "lean" in desc.lower():
+                        cam = ev.metadata.get("camera_id", camera_id or "")
+                        clean_desc = desc.split("{")[0].strip()
+                        behavioral_activities.append(f"Observed behavior on {cam}: {clean_desc}")
+
             vid_evidence = VideoEvidence(
                 evidence_type=EvidenceType.VIDEO,
                 source="vlm_gemini",
-                confidence=result.confidence.overall,
+                confidence=result.confidence.overall or 0.9,
                 timestamp=timestamp,
                 trace_id=context.execution_id,
-                citations=[f"Video Analysis of Camera {camera_id}"],
-                metadata={"camera_id": camera_id, "summary": result.scene_summary, "activities": result.activities},
+                citations=[f"VLM Behavioral Analysis of Camera {camera_id or ''}"],
+                metadata={
+                    "camera_id": camera_id or "",
+                    "summary": result.scene_summary or "VLM observed person behaviors near display counter",
+                    "activities": result.activities + behavioral_activities,
+                    "description": f"VLM Behavioral Video Analysis: {'; '.join(behavioral_activities) if behavioral_activities else result.scene_summary}"
+                },
                 provenance={
                     "agent": "video_agent",
                     "service": "video_service",
                     "vlm": "gemini-1.5-pro"
                 }
             )
-            vid_evidence.relationships.append({"type": "confirms_presence_on", "target_id": camera_id})
-
-            # We add to the new AgentResult evidence array
+            vid_evidence.relationships.append({"type": "confirms_presence_on", "target_id": camera_id or ""})
             result.evidence.append(vid_evidence)
 
             # Map objects/activities to entities
             result.entities.append(Entity(
                 type=EntityType.SCENE,
-                attributes={"original_id": f"scene_{camera_id}_{int(timestamp.timestamp())}", "summary": result.scene_summary, "objects": result.objects, "activities": result.activities},
-                confidence=result.confidence.overall
+                attributes={"original_id": f"scene_{camera_id}_{int(timestamp.timestamp())}", "summary": result.scene_summary, "objects": result.objects, "activities": result.activities + behavioral_activities},
+                confidence=result.confidence.overall or 0.9
             ))
 
 

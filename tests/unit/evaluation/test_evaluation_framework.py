@@ -43,8 +43,18 @@ def test_evaluation_framework():
     evaluator = Evaluator(scorers)
     
     # 4. Run Benchmark
-    runner = BenchmarkRunner(manifest, evaluator)
-    result = runner.run(suite)
+    from app.domain.evaluation.baseline import BaselineRepository
+    from tests.fakes.evaluation import FakeBaselineRepository
+    
+    # We patch the get_baseline method in the BaselineRepository for the test
+    original_get_baseline = BaselineRepository.get_baseline
+    BaselineRepository.get_baseline = FakeBaselineRepository.get_baseline
+    
+    try:
+        runner = BenchmarkRunner(manifest, evaluator)
+        result = runner.run(suite)
+    finally:
+        BaselineRepository.get_baseline = original_get_baseline
     
     # 5. Assertions
     assert result.scores.overall_score > 0

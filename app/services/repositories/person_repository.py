@@ -6,7 +6,7 @@ from app.services.repositories.base_repository import BaseRepository
 
 class PersonRepository(BaseRepository):
     """
-    Hides Milvus internal collection details for person search.
+    Hides Qdrant vector database collection details for person search.
     Returns typed domain models.
     """
     

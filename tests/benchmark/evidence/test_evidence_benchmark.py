@@ -14,7 +14,7 @@ def test_evidence_merge_latency(benchmark):
     Benchmark evidence agent deduplication and merging latency.
     """
     event_bus = EventBus()
-    agent = EvidenceAgent(event_bus)
+    agent = EvidenceAgent()
     
     # Pre-populate context results
     context = VistaContext(user=UserContext(user_id="bench", role="operator"), conversation_id="bench-1", current_query="merge")

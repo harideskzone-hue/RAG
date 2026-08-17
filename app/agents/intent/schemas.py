@@ -8,6 +8,8 @@ from app.schemas.context import BaseResult
 
 class IntentResult(BaseResult):
     intent: Intent = Intent.UNKNOWN
+    domain: str = "general"
+    operation: str = ""
     entities: dict[str, Any] = Field(default_factory=dict)
     query_intent: Any | None = None
     requires_clarification: bool = False

@@ -17,7 +17,7 @@ async def test_evidence_collector_deduplication_and_ordering():
     from app.services.vector_service import VectorService
     mock_meta = Mock(spec=MetadataService)
     mock_vec = Mock(spec=VectorService)
-    agent = EvidenceAgent(mock_meta, mock_vec)
+    agent = EvidenceAgent()
     
     context = VistaContext(user=UserContext(user_id="1", role="admin"), conversation_id="123")
     context.execution_plan = ExecutionPlan(success=True, agents=["evidence_agent"], intent="test")

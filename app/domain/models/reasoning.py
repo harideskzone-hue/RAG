@@ -61,6 +61,8 @@ class ReasoningResult(BaseModel):
     confidence_factors: list[ConfidenceFactor] = Field(default_factory=list)
     hypotheses: list[Hypothesis] = Field(default_factory=list)
     explanation: str = ""
+    thought: str = ""
+    thinking_process: str = ""
     errors: list[str] = Field(default_factory=list)
     next_actions: list[AgentExecutionRequest] = Field(default_factory=list)
 

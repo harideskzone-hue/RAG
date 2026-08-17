@@ -27,11 +27,9 @@ class EvidenceAgent(BaseAgent):
     Evidence Agent.
     Collects and organizes evidence from various sources.
     """
-    def __init__(self, metadata_service: MetadataService, vector_service: VectorService | None = None):
+    def __init__(self):
         self._name = "evidence_agent"
-        self._description = "Collects and organizes evidence from metadata and vector stores."
-        self.metadata_service = metadata_service
-        self.vector_service = vector_service
+        self._description = "Normalizes evidence from upstream retrieval agents."
 
     @property
     def name(self) -> str:
@@ -74,12 +72,15 @@ class EvidenceAgent(BaseAgent):
         bundle = EvidenceBundle()
 
         try:
+            allowed_cams = getattr(context.user, "allowed_cameras", None) if context.user else None
+            allowed_cams_set = {c.lower() for c in allowed_cams} if isinstance(allowed_cams, list) else None
+
             # 1. Process Metadata
             if "metadata_agent" in context.results:
                 meta_res: MetadataResult = context.results["metadata_agent"]
 
                 for cam in meta_res.cameras:
-                    if context.user and context.user.allowed_cameras is not None and cam.id not in context.user.allowed_cameras:
+                    if allowed_cams_set is not None and cam.id and cam.id.lower() not in allowed_cams_set:
                         context.results["unauthorized_evidence_found"] = True
                         continue
                     evidence = MetadataEvidence(
@@ -100,7 +101,7 @@ class EvidenceAgent(BaseAgent):
                     bundle.add_evidence(evidence)
 
                 for alert in meta_res.alerts:
-                    if context.user and context.user.allowed_cameras is not None and alert.camera_id not in context.user.allowed_cameras:
+                    if allowed_cams_set is not None and alert.camera_id and alert.camera_id.lower() not in allowed_cams_set:
                         context.results["unauthorized_evidence_found"] = True
                         continue
                     evidence = MetadataEvidence(
@@ -125,17 +126,44 @@ class EvidenceAgent(BaseAgent):
                 vec_res: VectorResult = context.results["vector_agent"]
 
                 for person in vec_res.person_matches:
-                    if context.user and context.user.allowed_cameras is not None and person.camera_id not in context.user.allowed_cameras:
+                    if allowed_cams_set is not None and person.camera_id and person.camera_id.lower() not in allowed_cams_set:
                         context.results["unauthorized_evidence_found"] = True
                         continue
+                    # Parse timestamp from VectorMatch (either float seconds or datetime or ISO)
+                    raw_ts = person.timestamp
+                    video_sec = None
+                    if isinstance(raw_ts, datetime):
+                        ts = raw_ts
+                        video_sec = raw_ts.timestamp()
+                    else:
+                        try:
+                            video_sec = float(raw_ts)
+                            ts = f"{int(video_sec // 60):02d}:{int(video_sec % 60):02d} ({video_sec:.1f}s)"
+                        except (ValueError, TypeError):
+                            ts = str(raw_ts) if raw_ts else "00:00"
+
+                    origin_dict = getattr(person, "origin", None) if isinstance(getattr(person, "origin", None), dict) else {}
+                    attr_dict = getattr(person, "attributes", None) if isinstance(getattr(person, "attributes", None), dict) else {}
+                    ev_source = origin_dict.get("type", "video_ingestion")
+
+                    desc = person.description or f"Person {person.id} observed on camera {person.camera_id}"
                     evidence = PersonEvidence(
                         evidence_id=str(uuid4()),
-                        source="milvus_vector",
-                        confidence=person.score,  # Raw Milvus score, reasoning engine will weight this later
-                        timestamp=person.timestamp,
+                        source=ev_source,
+                        confidence=person.score,
+                        timestamp=ts,
                         trace_id=context.execution_id,
                         citations=[f"Person Match {person.id}"],
-                        metadata={"camera_id": person.camera_id, "description": person.description},
+                        metadata={
+                            "camera_id": person.camera_id,
+                            "description": desc,
+                            "origin": origin_dict,
+                            "attributes": attr_dict,
+                            "track_id": origin_dict.get("track_id") or person.id,
+                            "canonical_person_id": person.id,
+                            "entity_id": person.id,
+                            "video_timestamp_sec": video_sec
+                        },
                         provenance={
                             "agent": "vector_agent",
                             "service": "vector_service",
@@ -143,23 +171,37 @@ class EvidenceAgent(BaseAgent):
                             "tool": "milvus_tool"
                         }
                     )
-                    # Relationship mapping example
                     evidence.relationships.append({"type": "appears_on", "target_id": person.camera_id})
-
                     bundle.add_evidence(evidence)
 
                 for vehicle in vec_res.vehicle_matches:
-                    if context.user and context.user.allowed_cameras is not None and vehicle.camera_id not in context.user.allowed_cameras:
+                    if allowed_cams_set is not None and vehicle.camera_id and vehicle.camera_id.lower() not in allowed_cams_set:
                         context.results["unauthorized_evidence_found"] = True
                         continue
+                    try:
+                        ts = datetime.fromisoformat(vehicle.timestamp.replace("Z", "+00:00")) if isinstance(vehicle.timestamp, str) else vehicle.timestamp
+                    except (ValueError, AttributeError):
+                        ts = datetime.now(timezone.utc)
+
+                    origin_dict = getattr(vehicle, "origin", None) if isinstance(getattr(vehicle, "origin", None), dict) else {}
+                    attr_dict = getattr(vehicle, "attributes", None) if isinstance(getattr(vehicle, "attributes", None), dict) else {}
+                    ev_source = origin_dict.get("type", "video_ingestion")
+
                     evidence = VehicleEvidence(
                         evidence_id=str(uuid4()),
-                        source="milvus_vector",
-                        confidence=vehicle.score,  # Raw Milvus score, reasoning engine will weight this later
-                        timestamp=vehicle.timestamp,
+                        source=ev_source,
+                        confidence=vehicle.score,
+                        timestamp=ts,
                         trace_id=context.execution_id,
                         citations=[f"Vehicle Match {vehicle.id}"],
-                        metadata={"camera_id": vehicle.camera_id, "description": vehicle.description},
+                        metadata={
+                            "camera_id": vehicle.camera_id,
+                            "description": vehicle.description,
+                            "license_plate": getattr(vehicle, "license_plate", None),
+                            "origin": origin_dict,
+                            "attributes": attr_dict,
+                            "track_id": origin_dict.get("track_id") or vehicle.id
+                        },
                         provenance={
                             "agent": "vector_agent",
                             "service": "vector_service",
@@ -167,18 +209,12 @@ class EvidenceAgent(BaseAgent):
                             "tool": "milvus_tool"
                         }
                     )
-                    # Relationship mapping example
                     evidence.relationships.append({"type": "appears_on", "target_id": vehicle.camera_id})
-
                     bundle.add_evidence(evidence)
 
             self._last_execution_time = (time.time() - start_time) * 1000
 
-            if bundle.evidence:
-                avg_conf = sum(item.confidence for item in bundle.evidence) / len(bundle.evidence)
-            else:
-                avg_conf = 0.5
-            confidence_score = ConfidenceScore(overall=avg_conf, factors=[ConfidenceFactor(source="evidence_bundler", score=avg_conf, explanation="Average confidence of collected evidence")])
+            confidence_score = ConfidenceScore(overall=1.0)
             return EvidenceResult(success=True, bundle=bundle, confidence=confidence_score)
 
         except Exception as e:

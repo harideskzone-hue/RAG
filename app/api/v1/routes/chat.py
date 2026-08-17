@@ -29,7 +29,8 @@ async def chat(
             allowed_cameras=current_user.get("allowed_cameras", [])
         ),
         conversation_id=payload.conversation_id or execution_id,
-        current_query=payload.query
+        current_query=payload.query,
+        active_video_id=payload.video_id
     )
     
     # Optional constraint
@@ -46,4 +47,8 @@ async def chat(
         
     # Translate to external representation
     response_model = ChatPresenter.present(result, execution_id, context.execution_time_ms)
+    
+    import logging
+    logging.getLogger(__name__).info(f"API Response Steps: {[s.name for s in response_model.execution.steps]}")
+    
     return response_model

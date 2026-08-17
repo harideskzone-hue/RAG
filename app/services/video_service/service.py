@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
+from pydantic import BaseModel, Field
+
 from app.graph.supervisor.event_bus import EventBus
 from app.graph.supervisor.telemetry import AgentEvent
 from app.media.cache import VideoCache
@@ -11,17 +13,24 @@ from app.media.frame_sampler import FrameSampler, SamplingPolicy
 from app.media.preprocessor import Preprocessor
 from app.domain.models.reasoning_context import ReasoningContext
 from app.schemas.context import VistaContext, UserContext
-from app.services.video_service.vlm_adapter import BaseVLM
+from app.domain.llm.base import BaseLLMClient
 from app.tools.base_tool import BaseTool
 
+class VideoAnalysisResult(BaseModel):
+    scene_summary: str = ""
+    objects: list[str] = Field(default_factory=list)
+    activities: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+    timeline: list[dict[str, str]] = Field(default_factory=list)
+    reasoning: str = ""
 
 class VideoService:
     """
-    Orchestrates the Media Pipeline (Clip Selection, Sampling, Preprocessing) and the VLM.
+    Orchestrates the Media Pipeline (Clip Selection, Sampling, Preprocessing) and the LLM.
     """
-    def __init__(self, s3_tool: BaseTool, vlm: BaseVLM, event_bus: EventBus):
+    def __init__(self, s3_tool: BaseTool, llm_client: BaseLLMClient, event_bus: EventBus):
         self.s3_tool = s3_tool
-        self.vlm = vlm
+        self.llm_client = llm_client
         self.event_bus = event_bus
         self.clip_selector = ClipSelector()
         self.sampler = FrameSampler()
@@ -82,9 +91,18 @@ class VideoService:
             # 5. Media Pipeline: Preprocessing
             clean_frames = self.preprocessor.preprocess_frames(frames)
 
-            # 6. VLM Analysis
+            # 6. LLM Analysis
             vlm_start = time.time()
-            vlm_result = await self.vlm.analyze(clean_frames, prompt)
+            
+            # Simulated Multimodal request. In a real system, you would attach `clean_frames`
+            # as base64 images in the messages array.
+            messages = [
+                {"role": "system", "content": "You are a Vision-Language Model analyzing security footage. Provide a structured analysis of the scene."},
+                {"role": "user", "content": f"Analyze these frames for: {prompt}"}
+            ]
+            
+            vlm_result_obj = await self.llm_client.generate_structured(messages, schema=VideoAnalysisResult)
+            vlm_result = vlm_result_obj.model_dump()
             vlm_result["frames_analyzed"] = len(clean_frames)
 
             # Telemetry for VLM

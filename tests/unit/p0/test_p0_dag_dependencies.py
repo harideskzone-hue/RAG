@@ -63,7 +63,7 @@ class TestP06DagDependencies:
         assert agent_group_indices["vector_agent"] < agent_group_indices["evidence_agent"]
 
     def test_video_analysis_requires_metadata_first(self):
-        """Video analysis should require metadata processing first"""
+        """Video and metadata retrieval should run in parallel (Layer 1)."""
         planner = ExecutionPlanner()
 
         context = VistaContext(
@@ -75,19 +75,15 @@ class TestP06DagDependencies:
 
         plan = planner._deterministic_fallback_plan(context)
 
-        # Based on agent manifests:
-        # - metadata_agent: no deps
-        # - video_agent: depends on metadata_agent
-        # So metadata_agent should run before video_agent
-
-        # Check execution order
+        # In the new pipeline, ALL retrieval agents run in parallel (Layer 1).
+        # metadata_agent and video_agent should be in the same execution group.
         agent_group_indices = {}
         for i, group in enumerate(plan.execution_groups):
             for agent in group.agents:
                 agent_group_indices[agent] = i
 
-        # metadata_agent should run before video_agent
-        assert agent_group_indices["metadata_agent"] < agent_group_indices["video_agent"]
+        # Both retrieval agents should be in the same group (parallel)
+        assert agent_group_indices["metadata_agent"] == agent_group_indices["video_agent"]
 
     def test_reasoning_requires_evidence_first(self):
         """Reasoning should require evidence processing first"""
@@ -166,7 +162,7 @@ class TestP06DagDependencies:
         all_planned_agents = []
         for group in plan.execution_groups:
             all_planned_agents.extend(group.agents)
-        assert set(all_planned_agents) == set(["metadata_agent"])
+        assert "metadata_agent" in set(all_planned_agents)
 
     @pytest.mark.asyncio
     async def test_planner_integration_with_context(self):

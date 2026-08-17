@@ -1,6 +1,9 @@
 import time
 import asyncio
+import logging
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 from app.agents.base_agent import BaseAgent
 from app.agents.intent.enums import Intent
@@ -24,7 +27,11 @@ class VectorAgent(BaseAgent):
     def __init__(self, vector_service: VectorService, encoder=None, llm_client=None):
         self._name = "vector_agent"
         self._description = "Performs semantic search for appearances, people, and vehicles."
-        self.service = vector_service
+        if vector_service is None or not hasattr(vector_service, "search_person"):
+            from app.api.dependencies.services import get_vector_service
+            self.service = get_vector_service()
+        else:
+            self.service = vector_service
         self._encoder = encoder
         self.expander = QueryExpander(llm_client=llm_client)
         self.reranker = PassThroughReranker()
@@ -61,7 +68,7 @@ class VectorAgent(BaseAgent):
 
     async def execute(self, context: VistaContext, plan: Any) -> VectorResult:
         start_time = time.time()
-        intent = context.execution_plan.intent
+        intent = context.execution_plan.intent if context.execution_plan else "PERSON_SEARCH"
         intent_result = context.results.get("intent_agent")
         entities = intent_result.entities if intent_result else {}
         
@@ -83,7 +90,12 @@ class VectorAgent(BaseAgent):
             # 1. Query Expansion
             expanded_queries = [original_query]
             if intent_result:
-                expanded_queries = await self.expander.expand(intent_result)
+                try:
+                    expanded = await self.expander.expand(intent_result)
+                    if expanded:
+                        expanded_queries = expanded
+                except Exception as ex:
+                    logger.warning(f"Query expansion failed: {ex}. Using original query.")
                 
             if self._encoder is not None:
                 encoder = self._encoder
@@ -93,47 +105,41 @@ class VectorAgent(BaseAgent):
                 
             mode = RetrievalMode.BALANCED
             intent_lower = intent.lower() if intent else ""
-            is_person = intent_lower == Intent.PERSON_SEARCH.value or "person" in entities.get("description", "").lower()
-            is_vehicle = intent_lower == Intent.VEHICLE_SEARCH.value or "vehicle" in entities.get("description", "").lower()
+            
+            # Capability-based routing using search_operations dynamically produced by LLM
+            query_intent = getattr(intent_result, 'query_intent', None)
+            search_ops = set(getattr(query_intent, 'search_operations', []) or [])
+            
+            run_person_cap = "vector_person" in search_ops
+            run_vehicle_cap = "vector_vehicle" in search_ops
+            
+            # If search_operations is unpopulated, derive capabilities from intent or run both for full coverage
+            if not run_person_cap and not run_vehicle_cap:
+                intent_val = getattr(intent_result, 'intent', None)
+                intent_name = str(intent_val.value if hasattr(intent_val, 'value') else intent_val).lower()
+                if intent_name == "vehicle_search":
+                    run_vehicle_cap = True
+                else:
+                    run_person_cap = True
 
             person_candidates = []
             vehicle_candidates = []
 
-            # 2. Parallel Retrieval
-            tasks = []
+            # 2. Parallel Retrieval based on active capabilities
             for query in expanded_queries:
                 query_embedding = encoder.encode(query)
-                if is_person:
-                    tasks.append(self.service.search_person(query_embedding, mode, context))
-                if is_vehicle:
-                    tasks.append(self.service.search_vehicle(query_embedding, mode, context))
-                    
-            if tasks:
-                results = await asyncio.gather(*tasks, return_exceptions=True)
-                for res in results:
-                    if isinstance(res, Exception):
-                        # Log or ignore individual failures
-                        continue
-                    if is_person and is_vehicle:
-                        # Depending on how gather was ordered, this could be complex. 
-                        # Let's simplify by running them cleanly if both are True.
-                        pass
-                    if is_person and not is_vehicle:
-                        person_candidates.extend(res)
-                    elif is_vehicle and not is_person:
-                        vehicle_candidates.extend(res)
-                        
-            # Handle the edge case where both person and vehicle are searched concurrently for the same query set
-            if is_person and is_vehicle:
-                # We need to cleanly separate tasks or just run them in sequence to avoid complex indexing
-                person_candidates = []
-                vehicle_candidates = []
-                for query in expanded_queries:
-                    emb = encoder.encode(query)
-                    p_res = await self.service.search_person(emb, mode, context)
-                    v_res = await self.service.search_vehicle(emb, mode, context)
-                    person_candidates.extend(p_res)
-                    vehicle_candidates.extend(v_res)
+                if run_person_cap:
+                    try:
+                        p_res = await self.service.search_person(query_embedding, mode, context)
+                        person_candidates.extend(p_res)
+                    except Exception as err:
+                        logger.error(f"search_person failed for query '{query}': {err}")
+                if run_vehicle_cap:
+                    try:
+                        v_res = await self.service.search_vehicle(query_embedding, mode, context)
+                        vehicle_candidates.extend(v_res)
+                    except Exception as err:
+                        logger.error(f"search_vehicle failed for query '{query}': {err}")
 
             # 3. Reranking
             if person_candidates:
@@ -148,17 +154,29 @@ class VectorAgent(BaseAgent):
 
             # 4. Map domain models to Evidence objects
             for match in result.person_matches:
+                origin_dict = getattr(match, "origin", None) or {}
+                attr_dict = getattr(match, "attributes", None) or {}
+                ev_source = origin_dict.get("type", "vector_agent")
+                
+                desc = match.description or f"Person track {match.id} observed on camera {match.camera_id}"
+                meta = {
+                    "camera_id": match.camera_id,
+                    "description": desc,
+                    "bbox": match.bbox,
+                    "origin": origin_dict,
+                    "attributes": attr_dict
+                }
                 result.evidence.append(PersonEvidence(
                     evidence_type=EvidenceType.VECTOR,
-                    source="vector_agent",
+                    source=ev_source,
                     confidence=match.score,
                     timestamp=match.timestamp,
                     trace_id=context.execution_id,
-                    metadata={"camera_id": match.camera_id, "description": match.description, "bbox": match.bbox}
+                    metadata=meta
                 ))
                 result.entities.append(Entity(
                     type=EntityType.PERSON,
-                    attributes={"original_id": match.id, "description": match.description, "bbox": match.bbox},
+                    attributes={"original_id": match.id, "description": match.description, "bbox": match.bbox, "origin": origin_dict, "attributes": attr_dict},
                     confidence=match.score
                 ))
 

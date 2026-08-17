@@ -1,67 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISTA AI Investigation Assistant</title>
-    <!-- CSS Modules -->
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/responsive.css">
-</head>
-<body>
-    <main class="main-content">
-        <section class="chat-panel">
-            <header class="chat-header">
-                <div class="logo-container" style="display: flex; align-items: center; gap: 12px;">
-                    <!-- Placeholder for the actual VISTA logo -->
-                    <img src="assets/images/logo.png" alt="VISTA Logo" style="height: 24px; width: auto; object-fit: contain; display: block;" onerror="this.style.display='none';">
-                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 600; color: var(--primary);">VISTA AI</h2>
-                </div>
-                <div class="status-indicator" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); box-shadow: none;" id="health-dot"></div>
-                    <span id="health-status" style="color: var(--text-muted);">Ready</span>
-                </div>
-            </header>
-            
-            <div class="chat-messages" id="chat-box">
-                <div class="welcome-screen" style="max-width: 600px; margin: 40px auto; text-align: center;">
-                    <h3 style="font-size: 1.5rem; color: var(--text-main); margin-bottom: 8px;">Welcome to VISTA AI</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 1rem;">Ask questions about your CCTV footage.</p>
-                    
-                    <div style="text-align: left; background: var(--user-bubble); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--glass-border);">
-                        <p style="font-weight: 600; margin-top: 0; margin-bottom: 12px; color: var(--text-main);">Try asking</p>
-                        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
-                            <li class="suggestion-item" style="color: var(--primary); cursor: pointer; padding: 8px 12px; background: var(--bg-panel); border: 1px solid var(--glass-border); border-radius: var(--radius-md); font-size: 0.9rem; transition: background 0.2s;">Is there any suspicious person?</li>
-                            <li class="suggestion-item" style="color: var(--primary); cursor: pointer; padding: 8px 12px; background: var(--bg-panel); border: 1px solid var(--glass-border); border-radius: var(--radius-md); font-size: 0.9rem; transition: background 0.2s;">Person in a blue shirt?</li>
-                            <li class="suggestion-item" style="color: var(--primary); cursor: pointer; padding: 8px 12px; background: var(--bg-panel); border: 1px solid var(--glass-border); border-radius: var(--radius-md); font-size: 0.9rem; transition: background 0.2s;">Where did the person go?</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chat-input-container">
-                <input type="text" id="chat-input" class="chat-input" placeholder="Ask about your CCTV footage..." autocomplete="off">
-                <button id="send-btn" class="btn" style="background: var(--primary); color: white; padding: 0 24px; border: none; border-radius: var(--radius-md); font-weight: 500; cursor: pointer; height: 100%;">Send</button>
-            </div>
-        </section>
-    </main>
-
-    <!-- JS Modules -->
-    <script type="module" src="js/app.js"></script>
-    <script>
-        // Quick binding for suggestion chips
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.suggestion-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    const input = document.getElementById('chat-input');
-                    input.value = e.target.innerText;
-                    input.focus();
-                });
-            });
-        });
-    </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VISTA AI</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

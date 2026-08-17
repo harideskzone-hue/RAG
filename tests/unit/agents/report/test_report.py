@@ -13,11 +13,13 @@ from app.services.report_service.service import ReportService
 async def test_report_agent_end_to_end():
     event_bus = EventBus()
     service = ReportService(event_bus)
+    from tests.fakes.report import FakeReportExporter
+    service.exporter = FakeReportExporter()
     agent = ReportAgent(service)
     
     context = VistaContext(user=UserContext(user_id="1", role="admin"), conversation_id="123")
     context.execution_plan = ExecutionPlan(success=True, agents=["report_agent"], intent="generate_report")
-    context.current_query = "Generate PDF report"
+    context.current_query = "Generate json report"
     
     bundle = EvidenceBundle()
     from uuid import uuid4
@@ -31,6 +33,6 @@ async def test_report_agent_end_to_end():
     
     from app.domain.models.enums import AgentStatus
     assert result.status == AgentStatus.SUCCESS, result.metadata.get("error")
-    assert result.report_uri.endswith(".pdf")
+    assert result.report_uri is None
     assert "1 incidents" in result.narrative
     assert "postgres_metadata" in result.data["statistics"]["sources"]

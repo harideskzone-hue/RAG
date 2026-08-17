@@ -39,6 +39,12 @@ class MCPToolAdapter:
             raise RuntimeError(reason)
         context.mcp_execution_count += 1
         
+        # Auto-fill missing required arguments from context
+        if not arguments.get("description") and getattr(context, "current_query", None):
+            arguments["description"] = context.current_query
+        if not arguments.get("camera_id"):
+            arguments["camera_id"] = ""
+
         # 1. Pydantic Schema Validation (Allowlist check)
         try:
             validated_args_obj = ToolRegistry.validate_tool_request(tool_name, arguments)

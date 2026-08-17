@@ -1,5 +1,5 @@
 
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, END
 
 from app.memory.manager import MemoryManager
 from app.schemas.context import VistaContext
@@ -9,24 +9,13 @@ class GraphBuilder:
     """
     Builder for the main VISTA AI LangGraph workflow.
     
-    ARCHITECTURE NOTE (Phase 3 Validation):
-    ----------------------------------------
-    Currently, the system routes directly from the chat API route to the Supervisor,
-    bypassing LangGraph orchestration entirely. This is intentional during the
-    stabilization phase.
+    The production graph implements:
+        Intent → Planner → Retrieval → Verification → Response → Grounding → END
     
-    The Supervisor internally handles: Intent → Planner → Validator → Agent Dispatch
-    
-    When LangGraph orchestration is needed (e.g., for complex multi-step workflows
-    with conditional routing, human-in-the-loop, or checkpointing), this builder
-    should be wired into the application via a dependency that replaces the direct
-    Supervisor call in the chat route.
-    
-    To activate LangGraph:
-    1. Implement node wrappers in app/graph/nodes/ (IntentNode, PlannerNode, etc.)
-    2. Implement routing logic in app/graph/edges/
-    3. Call build_core_workflow() to wire the graph
-    4. Replace get_supervisor DI with a compiled graph runner
+    With ABSTAIN routing at:
+        - Intent failure → ABSTAIN
+        - Verification failure (no evidence) → ABSTAIN
+        - Grounding failure (hallucination) → REJECT/ABSTAIN
     """
     def __init__(self, memory_manager: MemoryManager | None = None, checkpointer=None):
         self.workflow = StateGraph(VistaContext)
@@ -52,17 +41,72 @@ class GraphBuilder:
         """Compile the graph into a runnable application."""
         return self.workflow.compile(checkpointer=self.checkpointer)
 
-    def build_core_workflow(self):
+    def build_core_workflow(self, intent_node, planner_node, retrieval_node, 
+                            verification_node, response_node, grounding_node):
         """
-        Builds the foundational workflow:
-        User → Intent → Planner → Workflow Validator → Supervisor → Memory → END
+        Builds the production VISTA Agentic RAG workflow:
         
-        NOT YET ACTIVE — requires node implementations in app/graph/nodes/.
-        See class docstring for activation steps.
+            Intent → Planner → Retrieval → Verification → Response → Grounding → END
+        
+        ABSTAIN paths:
+            Intent (low confidence / invalid) → Response (abstain) → END
+            Verification (no evidence) → Response (abstain) → END
+            Grounding (hallucination) → END (with rejection message)
         """
-        # Placeholder — activate when node implementations are ready.
-        # Required nodes: IntentNode, PlannerNode, ValidatorNode, SupervisorNode
-        # Required edges: intent→planner, planner→validator, validator→supervisor
-        # Conditional edges: validator can route to clarification or rejection
-        return self
+        # Register nodes
+        self.workflow.add_node("intent", intent_node.execute)
+        self.workflow.add_node("planner", planner_node.execute)
+        self.workflow.add_node("retrieval", retrieval_node.execute)
+        self.workflow.add_node("verification", verification_node.execute)
+        self.workflow.add_node("response", response_node.execute)
+        self.workflow.add_node("grounding", grounding_node.execute)
 
+        # Set entry point
+        self.workflow.set_entry_point("intent")
+
+        # Intent → route based on whether intent was parsed successfully
+        def route_after_intent(state):
+            if state.get("abstain_reason") or state.get("query_intent") is None:
+                return "response"  # Skip to response for abstain message
+            return "planner"
+
+        self.workflow.add_conditional_edges(
+            "intent",
+            route_after_intent,
+            {"planner": "planner", "response": "response"}
+        )
+
+        # Planner → Retrieval (always, planner handles its own abstain logic)
+        self.workflow.add_edge("planner", "retrieval")
+
+        # Retrieval → Verification
+        self.workflow.add_edge("retrieval", "verification")
+
+        # Verification → route based on evidence sufficiency
+        def route_after_verification(state):
+            if state.get("abstain_reason") or state.get("verified_contract") is None:
+                return "response"  # No evidence → abstain response
+            return "response"  # Evidence found → generate response
+
+        self.workflow.add_conditional_edges(
+            "verification",
+            route_after_verification,
+            {"response": "response"}
+        )
+
+        # Response → Grounding (only if we have a verified contract, not abstaining)
+        def route_after_response(state):
+            if state.get("abstain_reason") and state.get("verified_contract") is None:
+                return END  # Pure abstain, no need to ground
+            return "grounding"
+
+        self.workflow.add_conditional_edges(
+            "response",
+            route_after_response,
+            {"grounding": "grounding", END: END}
+        )
+
+        # Grounding → END
+        self.workflow.add_edge("grounding", END)
+
+        return self

@@ -55,6 +55,7 @@ async def test_reasoning_pipeline_integration():
                     metadata={"description": "mock person"}
                 )
             ])
+            self.agent_decisions = []
             
     mock_context = MockContext()
     
@@ -65,6 +66,7 @@ async def test_reasoning_pipeline_integration():
     
     agent_result = await agent.execute(mock_context)
     mock_context = agent.finish(mock_context, agent_result)
+    mock_context.results["reasoning"] = agent_result
     
     # Assertions
     assert "reasoning" in mock_context.results

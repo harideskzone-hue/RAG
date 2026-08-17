@@ -96,16 +96,17 @@ class TestP03CameraRBAC:
         mock_s3_tool.execute = AsyncMock(return_value=mock_s3_result)
 
         # Mock VLM response
-        mock_vlm_response = {
-            "scene_summary": "Person detected",
-            "objects": [],
-            "activities": [],
-            "confidence": 0.8,
-            "frames_analyzed": 10,
-            "timeline": [],
-            "reasoning": "Test reasoning"
-        }
-        mock_vlm.analyze = AsyncMock(return_value=mock_vlm_response)
+        from app.services.video_service.service import VideoAnalysisResult
+        mock_vlm_response = VideoAnalysisResult(
+            scene_summary="Person detected",
+            objects=[],
+            activities=[],
+            confidence=0.8,
+            frames_analyzed=10,
+            timeline=[],
+            reasoning="Test reasoning"
+        )
+        mock_vlm.generate_structured = AsyncMock(return_value=mock_vlm_response)
 
         # Mock other service dependencies
         video_service.clip_selector = Mock()
@@ -172,16 +173,17 @@ class TestP03CameraRBAC:
         
         # Mock VLM Provider
         mock_vlm = AsyncMock()
-        mock_vlm_response = {
-            "scene_summary": "Authorized camera scene",
-            "objects": [],
-            "activities": [],
-            "confidence": 0.9,
-            "frames_analyzed": 10,
-            "timeline": [],
-            "reasoning": "Test reasoning"
-        }
-        mock_vlm.analyze = AsyncMock(return_value=mock_vlm_response)
+        from app.services.video_service.service import VideoAnalysisResult
+        mock_vlm_response = VideoAnalysisResult(
+            scene_summary="Authorized camera scene",
+            objects=[],
+            activities=[],
+            confidence=0.9,
+            frames_analyzed=10,
+            timeline=[],
+            reasoning="Test"
+        )
+        mock_vlm.generate_structured = AsyncMock(return_value=mock_vlm_response)
         
         video_service = VideoService(mock_s3, mock_vlm, event_bus)
 

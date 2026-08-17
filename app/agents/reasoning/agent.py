@@ -18,11 +18,13 @@ class ReasoningAgent(BaseAgent):
     Reasoning Agent wrapper that instantiates the coordinator and translates output to AgentResult.
     """
 
-    def __init__(self, service=None):
+    def __init__(self, service=None, llm_client=None):
         if isinstance(service, ReasoningService):
             reasoning_service = service
+        elif hasattr(service, "ainvoke"):
+            reasoning_service = ReasoningService(llm_client=service)
         else:
-            reasoning_service = ReasoningService()
+            reasoning_service = ReasoningService(llm_client=llm_client)
         self.service = reasoning_service
         self.coordinator = ReasoningCoordinator(self.service)
         self.logger = __import__("logging").getLogger(self.__class__.__name__)
@@ -67,15 +69,84 @@ class ReasoningAgent(BaseAgent):
                 has_evidence = True
 
             if not has_evidence:
-                # Legitimate empty retrieval -> grounded abstention
-                # When there's no evidence, we can be confident in that determination
-                # This is a confident negative result based on deterministic check
+                # If conversational / general query, invoke LLM directly to answer like a person agent
+                query_intent = getattr(context, "query_intent", None)
+                domain = getattr(query_intent, "domain", "investigation")
+                operation = getattr(query_intent, "operation", "")
+                raw_query = getattr(context, "current_query", "").strip()
+                query_clean = raw_query.lower().strip(" .,!?/")
+                
+                is_greeting = (
+                    domain == "general" 
+                    or operation in ("greeting", "capability_explanation")
+                    or query_clean in ["hi", "hello", "hey", "who are you", "what can you do", "help", "what is vista", "how does vista work"]
+                )
+                
+                if is_greeting:
+                    conversational_ans = (
+                        "Hello! 👋 I am VISTA AI, your intelligent video surveillance and forensic investigation companion. "
+                        "I specialize in multi-camera person tracking (Re-ID), activity analysis, entrance monitoring, "
+                        "and CCTV evidence verification. How can I assist your investigation today?"
+                    )
+                    if self.service.llm_client and query_clean not in ["hi", "hello", "hey"]:
+                        try:
+                            import asyncio
+                            llm_resp = await asyncio.wait_for(
+                                self.service.llm_client.ainvoke([
+                                    {
+                                        "role": "system",
+                                        "content": (
+                                            "You are VISTA AI, a highly capable, articulate, and intelligent AI assistant specialized in video intelligence, "
+                                            "surveillance analysis, multi-camera person tracking (Re-ID), and forensic investigation.\n"
+                                            "Respond conversationally, warmly, and helpfully like a person-like AI agent.\n"
+                                            "Introduce yourself and your capabilities if the user greets you or asks who you are."
+                                        )
+                                    },
+                                    {"role": "user", "content": raw_query}
+                                ]),
+                                timeout=4.0
+                            )
+                            conversational_ans = llm_resp.content.strip()
+                        except Exception as e:
+                            self.logger.warning(f"Conversational LLM fallback: {e}")
+
+                    greeting_thought = (
+                        "• Conversational Intent: Recognized greeting / general conversation query.\n"
+                        "• Fast Response Path: Initialized conversational agent without requiring physical CCTV scan.\n"
+                        "• System Status: Ready to execute multi-camera video intelligence, person tracking, and activity analysis."
+                    )
+
+                    return AgentResult(
+                        execution_id=getattr(context, "execution_id", uuid.uuid4()),
+                        agent_name="Reasoning Agent",
+                        agent_type=AgentType.REASONING,
+                        status=AgentStatus.SUCCESS,
+                        confidence=ConfidenceScore(overall=1.0, factors=[]),
+                        execution=ExecutionMetadata(
+                            start_time=datetime.datetime.now(datetime.timezone.utc),
+                            end_time=datetime.datetime.now(datetime.timezone.utc),
+                            duration_ms=10.0
+                        ),
+                        metadata={
+                            "answer": conversational_ans,
+                            "explanation": conversational_ans,
+                            "thought": greeting_thought,
+                            "thinking_process": greeting_thought,
+                            "completed_stages": ["intent_understanding", "greeting_synthesis"],
+                            "claims": [],
+                            "uncertainties": [],
+                            "hypotheses": [],
+                            "errors": []
+                        }
+                    )
+
+                # Legitimate empty retrieval on surveillance queries -> grounded abstention
                 return AgentResult(
                     execution_id=getattr(context, "execution_id", uuid.uuid4()),
                     agent_name="Reasoning Agent",
                     agent_type=AgentType.REASONING,
                     status=AgentStatus.SUCCESS,
-                    confidence=ConfidenceScore(overall=0.0, factors=[]),  # Low confidence when no evidence
+                    confidence=ConfidenceScore(overall=0.0, factors=[]),
                     execution=ExecutionMetadata(
                         start_time=datetime.datetime.now(datetime.timezone.utc),
                         end_time=datetime.datetime.now(datetime.timezone.utc),
@@ -84,6 +155,7 @@ class ReasoningAgent(BaseAgent):
                     metadata={
                         "hypotheses": [],
                         "explanation": "The available CCTV evidence is insufficient to answer your query.",
+                        "answer": "The available CCTV evidence is insufficient to answer your query.",
                         "errors": [],
                         "completed_stages": [],
                         "next_actions": [],
@@ -124,6 +196,8 @@ class ReasoningAgent(BaseAgent):
                 "unknown_facts": getattr(reasoning_result, 'unknown_facts', []),
                 "claims": [c.model_dump() for c in getattr(reasoning_result, 'claims', [])],
                 "uncertainties": getattr(reasoning_result, 'uncertainties', []),
+                "thought": getattr(reasoning_result, 'thought', ""),
+                "thinking_process": getattr(reasoning_result, 'thinking_process', ""),
                 "answer": getattr(reasoning_result, 'answer', "")
             }
             if hasattr(reasoning_result, 'error'):
@@ -155,7 +229,12 @@ class ReasoningAgent(BaseAgent):
         return True
 
     def finish(self, context: VistaContext, result: BaseResult) -> VistaContext:
-        context.results[AgentType.REASONING] = result
+        # ResultCollector in Supervisor handles context.results[self.name] = result
+        # This method only records the decision for audit trail
+        context.agent_decisions.append({
+            "agent": self.name,
+            "decision": f"Reasoning complete. Explanation: {getattr(result, 'metadata', {}).get('explanation', '')[:100]}",
+        })
         return context
 
     def confidence(self, result: BaseResult) -> float:

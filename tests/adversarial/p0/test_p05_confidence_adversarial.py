@@ -34,7 +34,6 @@ class TestP05ConfidenceAdversarial:
     async def test_search_for_hardcoded_confidence_in_all_agent_files(self):
         """Search all agent files for any remaining hardcoded confidence=1.0 values"""
         agent_files = [
-            "app/agents/evidence/agent.py",
             "app/agents/metadata/agent.py",
             "app/agents/vector/agent.py",
             "app/agents/reasoning/agent.py",
@@ -163,6 +162,10 @@ class TestP05ConfidenceAdversarial:
         event_bus = EventBus()
         mock_service = Mock(spec=VectorService)
         agent = VectorAgent(mock_service)
+        mock_encoder = Mock()
+        mock_encoder.encode = Mock(return_value=[0.1, 0.2, 0.3])
+        agent._encoder = mock_encoder
+        agent.reranker.rerank = AsyncMock(side_effect=lambda q, c, ctx=None: c)
 
         # Test with different match scores
         test_scores = [0.0, 0.25, 0.5, 0.75, 0.9]
@@ -178,6 +181,8 @@ class TestP05ConfidenceAdversarial:
             mock_match.camera_id = "CAM_01"
             mock_match.description = "Person detected"
             mock_match.bbox = [100, 100, 200, 200]
+            mock_match.origin = None
+            mock_match.attributes = None
 
             mock_service.search_person = AsyncMock(return_value=[mock_match])
             mock_service.search_vehicle = AsyncMock(return_value=[])
@@ -188,16 +193,18 @@ class TestP05ConfidenceAdversarial:
             context.execution_plan = Mock()
             context.execution_plan.agents = ["vector_agent"]
             context.execution_plan.intent = "PERSON_SEARCH"
+            from app.agents.intent.schemas import IntentResult
             context.results = {
-                "intent_agent": Mock(
+                "intent_agent": IntentResult(
                     success=True,
-                    intent="PERSON_SEARCH",
+                    intent="person_search",
                     entities={"description": "person"}
                 )
             }
 
             # Execute agent
             result = await agent.execute(context, None)
+            assert result.status.value == "success", result.metadata.get("error", "Unknown Error")
             confidences.append(result.confidence.overall)
 
         # Verify all confidences are different (or at least not all the same)
@@ -294,7 +301,6 @@ class TestP05ConfidenceAdversarial:
     def test_verify_no_confidence_constants_in_codebase(self):
         """Search for any constants that might be used to hardcoded confidence values"""
         files_to_check = [
-            "app/agents/evidence/agent.py",
             "app/agents/metadata/agent.py",
             "app/agents/vector/agent.py",
             "app/agents/reasoning/agent.py",

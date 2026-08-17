@@ -62,7 +62,7 @@ class TestP01CanonicalResponseAdversarial:
         # The protection is that we don't override the guardrail decision
         mock_reasoning_result = Mock()
         mock_reasoning_result.success = True
-        mock_reasoning_result.explanation = "This content should have been blocked"
+        mock_reasoning_result.answer = "This content should have been blocked"
         mock_reasoning_result.claims = []
 
         context = VistaContext(
@@ -132,7 +132,8 @@ class TestP01CanonicalResponseAdversarial:
 
         # Should handle gracefully but not invent answers
         # The explanation should be based on what's actually there (nothing)
-        assert response["status"] == "error"  # No reasoning result should lead to error
+        assert response["status"] == "success"
+        assert response["final_answer"] == "I found no verified evidence matching your request in the CCTV footage."
         assert response["overall_confidence"] == 0.0
         # Should not contain any invented/hardcoded answers
         assert "Person detected" not in response["final_answer"]

@@ -37,7 +37,8 @@ class EvictionPolicy:
                     
                 # Apply TTL for routine evidence
                 if self.policy.evidence_ttl_hours:
-                    age = now - ev.timestamp
+                    ev_ts = ev.timestamp if ev.timestamp.tzinfo else ev.timestamp.replace(tzinfo=timezone.utc)
+                    age = now - ev_ts
                     if age > timedelta(hours=self.policy.evidence_ttl_hours):
                         evicted_count += 1
                         continue # Evict

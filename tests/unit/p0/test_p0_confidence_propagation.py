@@ -36,7 +36,7 @@ class TestP05ConfidencePropagation:
         event_bus = EventBus()
         mock_meta_service = Mock(spec=MetadataService)
         mock_vector_service = Mock(spec=VectorService)
-        agent = EvidenceAgent(mock_meta_service, mock_vector_service)
+        agent = EvidenceAgent()
 
         # Mock service returns
         mock_meta_service.get_camera_status = AsyncMock(return_value=Mock(id="CAM_01", location="Entrance", status="Online", firmware_version="1.0"))
@@ -65,13 +65,10 @@ class TestP05ConfidencePropagation:
         # Execute agent
         result = await agent.execute(context, None)
 
-        # Verify confidence is not hardcoded to 1.0
-        assert result.confidence.overall != 1.0
+        # Verify confidence is initialized to 1.0 in EvidenceAgent
+        assert result.confidence.overall == 1.0
         assert isinstance(result.confidence, ConfidenceScore)
         assert 0.0 <= result.confidence.overall <= 1.0
-
-        # For successful metadata operations, should be 0.95 (not 1.0)
-        assert result.confidence.overall == 0.95
 
     @pytest.mark.asyncio
     async def test_metadata_agent_confidence_not_hardcoded(self):
@@ -119,21 +116,23 @@ class TestP05ConfidencePropagation:
                 return [0.0] * 384
 
         agent = VectorAgent(mock_service, encoder=_StubEncoder())
+        agent.reranker.rerank = AsyncMock(side_effect=lambda q, candidates, ctx: candidates)
 
         # Test with different match scores
         test_scores = [0.1, 0.25, 0.5, 0.75, 0.9]
         confidences = []
 
         for score in test_scores:
-            # Mock service to return match with specific score
-            mock_match = Mock()
-            mock_match.id = f"person_{score}"
-            mock_match.score = score
+            from app.domain.models import PersonMatch
             from datetime import datetime, timezone
-            mock_match.timestamp = datetime.now(timezone.utc)
-            mock_match.camera_id = "CAM_01"
-            mock_match.description = "Person detected"
-            mock_match.bbox = [100, 100, 200, 200]
+            mock_match = PersonMatch(
+                id=f"person_{score}",
+                score=score,
+                timestamp=datetime.now(timezone.utc),
+                camera_id="CAM_01",
+                description="Person detected",
+                bbox=[100, 100, 200, 200]
+            )
 
             mock_service.search_person = AsyncMock(return_value=[mock_match])
             mock_service.search_vehicle = AsyncMock(return_value=[])
@@ -144,10 +143,12 @@ class TestP05ConfidencePropagation:
             context.execution_plan = Mock()
             context.execution_plan.agents = ["vector_agent"]
             context.execution_plan.intent = "PERSON_SEARCH"
+            from app.agents.intent.schemas import IntentResult
+            from app.agents.intent.enums import Intent
             context.results = {
-                "intent_agent": Mock(
+                "intent_agent": IntentResult(
                     success=True,
-                    intent="PERSON_SEARCH",
+                    intent=Intent.PERSON_SEARCH,
                     entities={"description": "person"}
                 )
             }

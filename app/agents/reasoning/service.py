@@ -14,3 +14,7 @@ class ReasoningService:
         
     def get_explanation_generator(self) -> ExplanationGenerator:
         return ExplanationGenerator(llm_client=self.llm_client)
+
+    def get_evidence_verifier(self):
+        from app.agents.reasoning.engine.evidence_verifier import EvidenceVerifier
+        return EvidenceVerifier(llm_client=self.llm_client)

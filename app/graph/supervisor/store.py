@@ -27,8 +27,9 @@ class JSONCheckpointStore(CheckpointStore):
             try:
                 with open(self.checkpoints_path, 'r') as f:
                     self._checkpoints = json.load(f)
-            except Exception:
-                pass
+            except Exception as e:
+                import logging
+                logging.warning(f"Failed to load checkpoints: {e}")
 
     def _save(self):
         tmp_path = self.checkpoints_path + ".tmp"

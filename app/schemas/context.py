@@ -10,86 +10,15 @@ from app.domain.models.enums import ExecutionMode, ExecutionState
 from app.domain.models.blackboard import InvestigationBlackboard
 from app.domain.models.reasoning_context import ReasoningContext
 
-class QueryIntent(BaseModel):
-    entities: list[str] = Field(default_factory=list)
-    attributes: list[str] = Field(default_factory=list)
-    relations: list[str] = Field(default_factory=list)
-    raw_query: str = ""
+# Re-export from focused modules for backward compatibility
+from app.schemas.query import QueryIntent
+from app.schemas.base import Evidence, Citation, BaseResult
+from app.schemas.plan import ToolRequirement, ExecutionTask, ExecutionGroup, ExecutionPlan
 
 class UserContext(BaseModel):
     user_id: str
     role: str
     allowed_cameras: list[str] | None = None
-
-
-class Evidence(BaseModel):
-    type: str = ""
-    camera_id: str | None = None
-    timestamp: str | None = None
-    metadata_id: str | None = None
-    milvus_match_id: str | None = None
-    video_uri: str | None = None
-    description: str
-    confidence: float = 1.0
-
-
-class Citation(BaseModel):
-    source_type: str
-    source_id: str
-    content: str
-    relevance_score: float = 1.0
-
-
-class BaseResult(BaseModel):
-    success: bool
-    evidence: list[Evidence] = Field(default_factory=list)
-    confidence: ConfidenceScore = Field(default_factory=ConfidenceScore)
-    error: str | None = None
-
-
-class ToolRequirement(BaseModel):
-    name: str
-    arguments: dict[str, Any] = Field(default_factory=dict)
-    required: bool = True
-    timeout: int = 5
-    retry: int = 3
-
-
-class ExecutionTask(BaseModel):
-    task_id: str
-    description: str
-    agent_type: str
-    dependencies: list[str] = Field(default_factory=list)
-
-
-class ExecutionGroup(BaseModel):
-    """A group of agents that can execute in parallel."""
-    agents: list[str] = Field(default_factory=list)
-
-    def __iter__(self):
-        """Allow iterating directly over agent names for backward compatibility."""
-        return iter(self.agents)
-
-    def __len__(self):
-        return len(self.agents)
-
-
-class ExecutionPlan(BaseResult):
-    intent: str = ""
-    tasks: list[ExecutionTask] = Field(default_factory=list)
-    agents: list[str] = Field(default_factory=list)
-    tools: list[ToolRequirement] = Field(default_factory=list)
-    execution_groups: list[ExecutionGroup] = Field(default_factory=list)
-    dependencies: dict[str, list[str]] = Field(default_factory=dict)
-    priority: str = "normal"
-    risk_level: str = "LOW"
-    requires_vlm: bool = False
-    requires_confirmation: bool = False
-    estimated_tokens: int = 0
-    estimated_latency_ms: int = 0
-    estimated_tools: int = 0
-    estimated_llm_calls: int = 0
-    success_rate: float = 1.0
 
 
 class VistaContext(BaseModel):
@@ -100,6 +29,7 @@ class VistaContext(BaseModel):
     confidence_score: float = 0.0
     conversation_id: str = Field(default_factory=lambda: str(uuid4()))
     execution_id: str = Field(default_factory=lambda: str(uuid4()))
+    active_video_id: str | None = None
     current_query: str | None = None
     query_intent: QueryIntent | None = None
     execution_mode: ExecutionMode = ExecutionMode.SIMPLE

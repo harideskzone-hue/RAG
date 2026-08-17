@@ -6,7 +6,7 @@ from app.services.repositories.base_repository import BaseRepository
 
 class VehicleRepository(BaseRepository):
     """
-    Hides Milvus internal collection details for vehicle search.
+    Hides Qdrant vector database collection details for vehicle search.
     Returns typed domain models.
     """
     

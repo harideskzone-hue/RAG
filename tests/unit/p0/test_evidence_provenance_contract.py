@@ -171,7 +171,7 @@ def test_missing_reasoning_agent_blocks():
     response = coordinator.generate_response(context)
     
     assert response["status"] == "error"
-    assert "Response blocked" in response["final_answer"]
+    assert ("unable to complete reasoning" in response["final_answer"].lower() or "blocked" in response["final_answer"].lower())
     assert len(response["evidence"]) == 0
 
 def test_reasoning_claim_without_evidence_blocks():

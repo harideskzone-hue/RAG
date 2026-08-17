@@ -22,7 +22,7 @@ class Settings(BaseModel):
     json_logs: bool = Field(default_factory=lambda: os.getenv("JSON_LOGS", "true").lower() == "true")
     
     # Frontend
-    frontend_urls: str = Field(default_factory=lambda: os.getenv("FRONTEND_URLS", "http://localhost:5500,http://127.0.0.1:5500,http://[::]:5500"))
+    frontend_urls: str = Field(default_factory=lambda: os.getenv("FRONTEND_URLS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://localhost:5500"))
     
     # Enable toggles
     enable_tracing: bool = Field(default_factory=lambda: os.getenv("ENABLE_TRACING", "true").lower() == "true")

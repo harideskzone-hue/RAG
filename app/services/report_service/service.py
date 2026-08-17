@@ -47,8 +47,10 @@ class ReportService:
             
             exported_content = self.exporter.export(report_data, format_type)
             
-            # Mocking saving the file and getting a URI
-            report_uri = f"s3://vista-reports/{context.user.user_id}_{int(time.time())}.{format_type}"
+            if format_type == "json":
+                report_uri = None
+            else:
+                raise NotImplementedError("Saving reports to storage requires a configured storage client.")
             
             result = {
                 "report_uri": report_uri,

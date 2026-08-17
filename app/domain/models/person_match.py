@@ -8,3 +8,5 @@ class PersonMatch(BaseModel):
     score: float
     description: str
     bbox: list[float] | None = None
+    origin: dict | None = None
+    attributes: dict | None = None

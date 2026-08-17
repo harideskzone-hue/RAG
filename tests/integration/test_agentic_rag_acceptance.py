@@ -23,9 +23,19 @@ app.dependency_overrides[get_current_user] = override_get_current_user
 # --- Helper ---
 async def run_scenario(client, query: str, mock_execute_fn, intent_metadata=None):
     with patch.object(ReasoningCoordinator, 'execute', new=mock_execute_fn):
-        with patch('app.agents.intent.agent.IntentAgent.execute') as mock_intent:
+        with patch('app.agents.intent.classifier.HybridIntentClassifier.classify') as mock_intent:
             if intent_metadata:
-                mock_intent.return_value.metadata = intent_metadata
+                from app.agents.intent.schemas import IntentResult
+                mock_intent.return_value = IntentResult(
+                    success=True,
+                    intent=intent_metadata.get("intent", "UNKNOWN").lower(),
+                    query_intent=intent_metadata
+                )
+            else:
+                from app.agents.intent.schemas import IntentResult
+                mock_intent.return_value = IntentResult(success=True, intent="unknown")
+            
+            print(f"DEBUG: intent_metadata={intent_metadata}, mock_return={mock_intent.return_value}")
             response = await client.post(
                 "/api/v1/chat",
                 json={"query": query},

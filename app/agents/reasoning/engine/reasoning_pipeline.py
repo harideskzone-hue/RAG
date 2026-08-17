@@ -13,23 +13,19 @@ class ReasoningPipeline:
     """
     Executes the deterministic and semantic reasoning stages sequentially.
     """
-    def __init__(self, hypothesis_generator: HypothesisGenerator, explanation_generator: ExplanationGenerator):
+    def __init__(self, hypothesis_generator: HypothesisGenerator, explanation_generator: ExplanationGenerator, evidence_verifier: EvidenceVerifier | None = None):
         self.correlator = Correlator()
         self.contradiction_detector = ContradictionDetector()
         self.gap_analyzer = GapAnalyzer()
         self.hypothesis_generator = hypothesis_generator
         self.hypothesis_ranker = HypothesisRanker()
         self.explanation_generator = explanation_generator
-        self.evidence_verifier = EvidenceVerifier()
+        self.evidence_verifier = evidence_verifier or EvidenceVerifier()
         
     async def run_stage(self, context: ReasoningContext, stage: ReasoningStage, **kwargs) -> EngineResult:
         if stage == ReasoningStage.CORRELATION:
             return self.correlator.run(context)
         elif stage == ReasoningStage.CONTRADICTION:
-            # We don't actually run it concurrently here if we rely on coordinator to pass state explicitly,
-            # but we can return it. Wait, the Coordinator calls run_stage for each.
-            # To do it concurrently, we'd need to change Coordinator. Let's leave run_stage as is,
-            # and modify ReasoningCoordinator to gather them instead.
             return self.contradiction_detector.run(context)
         elif stage == ReasoningStage.GAP_ANALYSIS:
             return self.gap_analyzer.run(context)
@@ -40,6 +36,6 @@ class ReasoningPipeline:
         elif stage == ReasoningStage.EXPLANATION:
             return await self.explanation_generator.run(context, kwargs.get("ranked_hypotheses", []))
         elif stage == ReasoningStage.VERIFICATION:
-            return self.evidence_verifier.run(context, kwargs.get("explanation", ""), kwargs.get("hypotheses", []))
+            return await self.evidence_verifier.run_async(context, kwargs.get("explanation", ""), kwargs.get("hypotheses", []))
         
         return EngineResult(success=False, errors=[f"Unknown stage {stage}"])

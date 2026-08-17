@@ -117,6 +117,18 @@ class WorkflowValidator:
                     if agent_idx <= dep_idx:
                         result.errors.append(f"Agent '{agent}' (Group {agent_idx}) depends on '{dep}' (Group {dep_idx}), which is in the same or a later execution group.")
 
+        # Pipeline Ordering Contract: No evidence-producing agent may execute after Verification
+        evidence_agents = {"video_agent", "metadata_agent", "vector_agent", "event_agent", "evidence_fusion_agent"}
+        verification_idx = agent_to_group_idx.get("verification_agent", -1)
+        
+        if verification_idx != -1:
+            for agent, idx in agent_to_group_idx.items():
+                if agent in evidence_agents and idx > verification_idx:
+                    result.errors.append(
+                        f"Pipeline ordering contract violated: Evidence producer '{agent}' "
+                        f"(Group {idx}) scheduled after verification_agent (Group {verification_idx})."
+                    )
+
     def _validate_permissions(self, context: VistaContext, plan: ExecutionPlan, result: ValidationResult):
         role = context.user.role.lower()
         allowed = self.role_permissions.get(role, {"agents": [], "tools": []})

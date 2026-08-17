@@ -10,14 +10,14 @@ from app.tools.vector.store import get_vector_store
 from app.platform.config.config import config
 
 
-class MilvusTool(BaseTool):
+class VectorTool(BaseTool):
     """
-    Executes raw vector search against Milvus (or NativeVectorStore).
+    Executes raw vector search against the canonical vector store (Qdrant).
     Generic: Requires collection name and embedding.
     """
     def __init__(self, event_bus: EventBus):
-        self._name = "milvus"
-        self._description = "Executes similarity search on the vector database."
+        self._name = "vector"
+        self._description = "Executes similarity search on the canonical vector database (Qdrant)."
         self.event_bus = event_bus
         self.store = get_vector_store()
 
@@ -38,7 +38,7 @@ class MilvusTool(BaseTool):
         
         # Publish telemetry start
         self.event_bus.publish(AgentEvent(
-            agent_name="tool_milvus",
+            agent_name="tool_vector",
             event_type="TOOL_START",
             start_time=start_time,
             status="RUNNING",
@@ -48,13 +48,14 @@ class MilvusTool(BaseTool):
         
         try:
             allowed_cameras = getattr(context.user, "allowed_cameras", None) if getattr(context, "user", None) else None
-            matches = await self.store.search(collection, embedding, top_k, allowed_cameras=allowed_cameras)
+            video_id = getattr(context, "active_video_id", None)
+            matches = await self.store.search(collection, embedding, top_k, allowed_cameras=allowed_cameras, video_id=video_id)
             
             latency_ms = (time.time() - start_time) * 1000
             
             # Publish telemetry success
             self.event_bus.publish(AgentEvent(
-                agent_name="tool_milvus",
+                agent_name="tool_vector",
                 event_type="TOOL_COMPLETE",
                 start_time=start_time,
                 end_time=time.time(),
@@ -75,7 +76,7 @@ class MilvusTool(BaseTool):
             
             # Publish telemetry error
             self.event_bus.publish(AgentEvent(
-                agent_name="tool_milvus",
+                agent_name="tool_vector",
                 event_type="TOOL_ERROR",
                 start_time=start_time,
                 end_time=time.time(),
@@ -101,6 +102,10 @@ class MilvusTool(BaseTool):
     def metadata(self) -> dict[str, Any]:
         return {
             "type": "vector_database",
-            "engine": "milvus_or_native",
+            "engine": "qdrant",
             "mocked": config.mode == "native"
         }
+
+
+# Backwards-compatible alias — existing code importing MilvusTool will still work
+MilvusTool = VectorTool

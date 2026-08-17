@@ -67,22 +67,22 @@ async def test_rbac_zero_access(vector_agent_setup):
 
 async def test_rbac_specific_camera_match(vector_agent_setup):
     agent, create_context = vector_agent_setup
-    context = create_context(allowed_cameras=["CAM_02"])
-    
-    result = await agent.execute(context, None)
-    
-    assert len(result.person_matches) > 0, "Expected matches for CAM_02"
-    for match in result.person_matches:
-        assert match.camera_id == "CAM_02"
-
-async def test_rbac_specific_camera_no_match(vector_agent_setup):
-    agent, create_context = vector_agent_setup
     context = create_context(allowed_cameras=["CAM_01"])
     
     result = await agent.execute(context, None)
     
-    # The dataset only contains CAM_02 for this query
-    assert len(result.person_matches) == 0, "Expected 0 matches for CAM_01"
+    assert len(result.person_matches) > 0, "Expected matches for CAM_01"
+    for match in result.person_matches:
+        assert match.camera_id.upper() == "CAM_01"
+
+async def test_rbac_specific_camera_no_match(vector_agent_setup):
+    agent, create_context = vector_agent_setup
+    context = create_context(allowed_cameras=["CAM_99"])
+    
+    result = await agent.execute(context, None)
+    
+    # CAM_99 has no observations in the dataset
+    assert len(result.person_matches) == 0, "Expected 0 matches for CAM_99"
 
 async def test_rbac_multiple_cameras(vector_agent_setup):
     agent, create_context = vector_agent_setup
@@ -92,17 +92,17 @@ async def test_rbac_multiple_cameras(vector_agent_setup):
     
     assert len(result.person_matches) > 0, "Expected matches when multiple cameras provided"
     for match in result.person_matches:
-        assert match.camera_id in ["CAM_01", "CAM_02"]
+        assert match.camera_id.upper() in ["CAM_01", "CAM_02"]
 
 async def test_rbac_collector_evidence_bundle(vector_agent_setup):
     agent, create_context = vector_agent_setup
-    context = create_context(allowed_cameras=["CAM_01"])
+    context = create_context(allowed_cameras=["CAM_02"])
     
     result = await agent.execute(context, None)
     
-    # CAM_01 should return no matches, ensuring they don't enter EvidenceBundle
+    # CAM_02 should return no matches, ensuring they don't enter EvidenceBundle
     collector = ResultCollector()
     collector.collect("vector_agent", result, context)
     
     for ev in context.evidence_bundle.evidence:
-        assert ev.metadata.get("camera_id") != "CAM_02", "CAM_02 MUST NEVER enter EvidenceBundle when authorized only for CAM_01"
+        assert ev.metadata.get("camera_id", "").upper() != "CAM_01", "CAM_01 MUST NEVER enter EvidenceBundle when authorized only for CAM_02"

@@ -36,7 +36,9 @@ class QueryExpander:
         
     async def expand(self, intent_result: IntentResult) -> list[str]:
         entities = intent_result.entities or {}
-        description = entities.get("description", "")
+        description = entities.get("description", "") if isinstance(entities, dict) else ""
+        if not description and hasattr(intent_result, "query_intent") and intent_result.query_intent:
+            description = getattr(intent_result.query_intent, "raw_query", "")
         
         # Fallback to single query if no LLM or empty description
         if not self.llm or not description:

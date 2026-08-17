@@ -1,3 +1,4 @@
+import pytest
 from app.agents.intent.enums import Intent
 from app.agents.intent.extractor import FastIntentExtractor
 
@@ -46,3 +47,38 @@ def test_fast_intent_extractor_specifics():
     entities = extractor.extract_entities_basic("Show the clip from Camera 2 at 10:15")
     assert "camera_id" in entities
     assert entities["camera_id"] == "2"
+
+
+@pytest.mark.asyncio
+async def test_hybrid_intent_classifier_llm_invocation():
+    """Verify that HybridIntentClassifier invokes the LLM client dynamically to generate QueryIntent."""
+    from unittest.mock import AsyncMock, MagicMock
+    import json
+    import pytest
+    from app.agents.intent.classifier import HybridIntentClassifier
+
+    mock_llm = AsyncMock()
+    mock_response = MagicMock()
+    mock_response.content = json.dumps({
+        "domain": "investigation",
+        "operation": "behavioral_investigation",
+        "intent": "behavioral_investigation",
+        "target_type": "person",
+        "semantic_constraints": [],
+        "attributes": [],
+        "search_operations": ["vector_person", "event_query"],
+        "required_capabilities": ["person_search", "video_analysis", "behavior_analysis"],
+        "confidence": 0.95,
+        "requires_clarification": False
+    })
+    mock_llm.ainvoke.return_value = mock_response
+
+    classifier = HybridIntentClassifier(llm_client=mock_llm)
+    result = await classifier.classify("Is there any suspicious person in the CCTV?")
+
+    assert mock_llm.ainvoke.called
+    assert result.success is True
+    assert result.domain == "investigation"
+    assert result.operation == "behavioral_investigation"
+    assert result.query_intent.target_type == "person"
+    assert result.query_intent.attributes == []

@@ -7,8 +7,12 @@ def test_vlm_timeout(client, valid_token):
     """
     Scenario: VLM API (e.g. Gemini) times out.
     """
-    # Assuming GeminiAdapter raises ServiceError on timeout
-    with patch("app.services.video_service.vlm_adapter.GeminiAdapter.analyze", side_effect=ServiceError("VLM Timeout")):
+    # Mock the LLM client returned by the registry to raise a ServiceError on generation
+    from unittest.mock import Mock, AsyncMock
+    mock_client = Mock()
+    mock_client.generate_structured = AsyncMock(side_effect=ServiceError("VLM Timeout"))
+    
+    with patch("app.infrastructure.llm.model_registry.ModelRegistry.get_client", return_value=mock_client):
         payload = {
             "query": "Find the person in a blue hat." # Triggers Vector + Video
         }

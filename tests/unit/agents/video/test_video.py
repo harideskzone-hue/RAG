@@ -8,7 +8,7 @@ from app.domain.evidence import EvidenceBundle, MetadataEvidence
 from app.graph.supervisor.event_bus import EventBus
 from app.schemas.context import ExecutionPlan, UserContext, VistaContext
 from app.services.video_service.service import VideoService
-from app.services.video_service.vlm_adapter import GeminiAdapter
+from app.infrastructure.llm.model_registry import ModelRegistry
 from app.tools.video.s3_tool import S3Tool
 
 
@@ -16,10 +16,24 @@ from app.tools.video.s3_tool import S3Tool
 async def test_video_agent_end_to_end():
     event_bus = EventBus()
     s3_tool = S3Tool(event_bus)
-    vlm = GeminiAdapter()
+    vlm = ModelRegistry.get_client()
     
     # Service
     service = VideoService(s3_tool, vlm, event_bus)
+    
+    # Mock VLM response
+    from app.services.video_service.service import VideoAnalysisResult
+    from unittest.mock import AsyncMock
+    mock_vlm_response = VideoAnalysisResult(
+        scene_summary="A person running through the lobby.",
+        objects=["person", "blue shirt", "backpack"],
+        activities=["running", "entering"],
+        confidence=0.95,
+        frames_analyzed=10,
+        timeline=[{"timestamp": "0:02", "description": "Person appears"}],
+        reasoning="The visual evidence clearly shows a person matching the description running."
+    )
+    vlm.generate_structured = AsyncMock(return_value=mock_vlm_response)
     
     # Agent
     agent = VideoAgent(service)

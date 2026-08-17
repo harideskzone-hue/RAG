@@ -31,6 +31,11 @@ class MockReasoningClient:
         import copy
         
         prompt = str(messages)
+        
+        # Detect EvidenceVerifier LLM Judge prompt — respond with aligned=true
+        if "Evidence Judge" in prompt or '"aligned"' in prompt or "semantically follow" in prompt:
+            return DummyResponse(json.dumps({"aligned": True, "reason": "Mock verifier: claim is aligned with evidence."}))
+        
         dynamic_claims = copy.deepcopy(self.claims)
         
         # Find all UUIDs in the prompt
@@ -120,6 +125,7 @@ async def _run_test(supervisor, base_context, client, query, expected_status="su
     reasoning_agent = agent_registry.get_agent("reasoning_agent")
     reasoning_agent.coordinator.pipeline.hypothesis_generator.llm = client
     reasoning_agent.coordinator.pipeline.explanation_generator.llm = client
+    reasoning_agent.coordinator.pipeline.evidence_verifier.llm_client = client
     
     response = await supervisor.run(base_context)
     
@@ -128,7 +134,10 @@ async def _run_test(supervisor, base_context, client, query, expected_status="su
             print(f"FAILED! Final answer was: {response.get('final_answer')}")
         assert response["status"] == "success"
         assert response["final_answer"] != ""
-        assert len(response.get("evidence", [])) > 0 or "insufficient" in response["final_answer"].lower()
+        answer_lower = response["final_answer"].lower()
+        has_evidence = len(response.get("evidence", [])) > 0
+        is_abstention = any(phrase in answer_lower for phrase in ["insufficient", "no evidence", "not found", "do not see", "unable to"])
+        assert has_evidence or is_abstention, f"Expected evidence or abstention, got: {response['final_answer']}"
     else:
         if response["status"] != "error":
             print(f"FAILED! Expected error but got success. Final answer was: {response.get('final_answer')}")
@@ -167,9 +176,11 @@ async def test_workflow_purple_jacket(supervisor: Supervisor, base_context: Vist
 
 @pytest.mark.asyncio
 async def test_negative_fake_alias(supervisor: Supervisor, base_context: VistaContext):
-    """Fake evidence alias -> BLOCK (The LLM must use UUIDs, E999 is invalid)"""
+    """Fake evidence alias -> SAFE ABSTENTION (E999 is silently rejected, system abstains)"""
     client = MockReasoningClient(claims=[{"statement": "Fake alias", "evidence_ids": ["E999"], "confidence": 0.9, "support_type": "direct"}])
-    await _run_test(supervisor, base_context, client, "fake alias test", expected_status="error")
+    res = await _run_test(supervisor, base_context, client, "fake alias test", expected_status="success")
+    # Verify it abstained (no hallucinated claims passed through)
+    assert "no evidence" in res["final_answer"].lower() or len(res.get("evidence", [])) == 0
 
 @pytest.mark.asyncio
 async def test_negative_integer_alias(supervisor: Supervisor, base_context: VistaContext):
@@ -196,6 +207,9 @@ async def test_positive_multiple_uuids(supervisor: Supervisor, base_context: Vis
         async def ainvoke(self, messages):
             import re, copy, json
             prompt = str(messages)
+            # Detect EvidenceVerifier LLM Judge prompt
+            if "Evidence Judge" in prompt or '"aligned"' in prompt or "semantically follow" in prompt:
+                return type('Dummy', (), {'content': json.dumps({"aligned": True, "reason": "Mock verifier: aligned."})})()
             uuids = re.findall(r"UUID: ([0-9a-fA-F\-]+)", prompt)
             dynamic_claims = copy.deepcopy(self.claims)
             dynamic_claims[0]["evidence_ids"] = uuids[:2] if len(uuids) >= 2 else (uuids[:1] if uuids else [])
@@ -207,6 +221,8 @@ async def test_positive_multiple_uuids(supervisor: Supervisor, base_context: Vis
 
 @pytest.mark.asyncio
 async def test_negative_hallucinated_uuid(supervisor: Supervisor, base_context: VistaContext):
-    """evidence_ids with hallucinated raw UUID -> BLOCK (must be from EvidenceBundle)"""
+    """evidence_ids with hallucinated raw UUID -> SAFE ABSTENTION (hallucinated UUID silently rejected)"""
     client = MockReasoningClient(claims=[{"statement": "Raw UUID", "evidence_ids": ["a8f698c8-5ee6-4c91-aeea-d317c119b87d"], "confidence": 0.9, "support_type": "direct"}])
-    await _run_test(supervisor, base_context, client, "raw uuid test", expected_status="error")
+    res = await _run_test(supervisor, base_context, client, "raw uuid test", expected_status="success")
+    # Verify it abstained (hallucinated claim did not pass through)
+    assert "no evidence" in res["final_answer"].lower() or len(res.get("evidence", [])) == 0

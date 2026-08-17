@@ -10,7 +10,7 @@ class AnalyticsEngine:
     def calculate(self, bundle: EvidenceBundle) -> dict[str, Any]:
         return {
             "total_incidents": len(bundle.evidence),
-            "critical_incidents": len([e for e in bundle.evidence if e.confidence > 0.9])
+            "critical_incidents": len([e for e in bundle.evidence if (getattr(e.confidence, 'overall', e.confidence) if hasattr(e.confidence, 'overall') else e.confidence) > 0.9])
         }
 
 class StatisticsEngine:

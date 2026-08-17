@@ -20,7 +20,7 @@ from app.agents.reasoning.service import ReasoningService
 from app.agents.guardrail.agent import GuardrailAgent
 
 # Tools
-from app.api.dependencies.repositories import get_milvus_tool, get_postgres_tool
+from app.api.dependencies.repositories import get_vector_tool, get_postgres_tool
 from app.api.dependencies.services import (
     get_event_bus,
     get_event_service,
@@ -42,7 +42,7 @@ _initialized = False
 
 
 def _initialize_registries(
-    event_bus, postgres_tool, milvus_tool, s3_tool,
+    event_bus, postgres_tool, vector_tool, s3_tool,
     metadata_service, vector_service, video_service,
     event_service, report_service
 ):
@@ -54,8 +54,8 @@ def _initialize_registries(
     # Register Tools (only if not already registered)
     if not tool_registry.get_tool(postgres_tool.name):
         tool_registry.register(postgres_tool.name, postgres_tool.execute, postgres_tool.description)
-    if not tool_registry.get_tool(milvus_tool.name):
-        tool_registry.register(milvus_tool.name, milvus_tool.execute, milvus_tool.description)
+    if not tool_registry.get_tool(vector_tool.name):
+        tool_registry.register(vector_tool.name, vector_tool.execute, vector_tool.description)
     if not tool_registry.get_tool(s3_tool.name):
         tool_registry.register(s3_tool.name, s3_tool.execute, s3_tool.description)
         
@@ -65,31 +65,33 @@ def _initialize_registries(
     vlm_provider = os.environ.get("VLM_PROVIDER", "gemini")
     reasoning_provider = os.environ.get("REASONING_PROVIDER", "ollama")
     
-    if reasoning_provider == "ollama":
-        from app.domain.llm.ollama_reasoning_client import OllamaReasoningClient
-        reasoning_llm_client = OllamaReasoningClient()
-    elif reasoning_provider == "local":
-        from app.domain.llm.local_reasoning_client import LocalReasoningClient
-        reasoning_llm_client = LocalReasoningClient()
-    else:
-        logger.info(f"REASONING_PROVIDER is {reasoning_provider}. Model execution disabled for reasoning.")
-        from app.domain.llm.local_reasoning_client import LocalReasoningClient
-        class DisabledReasoningClient(LocalReasoningClient):
-            async def ainvoke(self, messages):
-                raise Exception("MODEL_UNAVAILABLE: Reasoning model is explicitly disabled via configuration.")
-        reasoning_llm_client = DisabledReasoningClient()
+    # Use the LLM abstraction layer — agents never import provider-specific clients
+    from app.infrastructure.llm.model_registry import ModelRegistry
+
+    try:
+        reasoning_llm_client = ModelRegistry.get_client(role="reasoning")
+    except Exception as e:
+        logger.warning(f"LLM client initialization failed: {e}. Reasoning disabled.")
+        reasoning_llm_client = ModelRegistry.get_client(provider="disabled")
+
     
+    from app.agents.time.agent import TimeAgent
+    from app.agents.evidence_fusion.agent import EvidenceFusionAgent
+    from app.agents.verification.agent import VerificationAgent
     agents_to_register = [
         MetadataAgent(metadata_service),
         VectorAgent(vector_service),
-        EvidenceAgent(metadata_service, vector_service),
+        EvidenceAgent(),
         ConfidenceAgent(confidence_engine),
         VideoAgent(video_service),
         EventAgent(event_service),
         ReportAgent(report_service),
         KnowledgeGraphAgent(),
+        EvidenceFusionAgent(),
+        VerificationAgent(),
         ReasoningAgent(ReasoningService(reasoning_llm_client)),
-        GuardrailAgent()
+        GuardrailAgent(),
+        TimeAgent()
     ]
     
     for agent in agents_to_register:
@@ -100,10 +102,12 @@ def _initialize_registries(
     logger.info("Tool and agent registries initialized.")
 
 
+from app.api.dependencies.repositories import _is_depends
+
 def get_supervisor(
     event_bus: EventBus = Depends(get_event_bus),
     postgres_tool = Depends(get_postgres_tool),
-    milvus_tool = Depends(get_milvus_tool),
+    vector_tool = Depends(get_vector_tool),
     s3_tool = Depends(get_s3_tool),
     metadata_service = Depends(get_metadata_service),
     vector_service = Depends(get_vector_service),
@@ -111,10 +115,28 @@ def get_supervisor(
     event_service = Depends(get_event_service),
     report_service = Depends(get_report_service)
 ) -> Supervisor:
+    if _is_depends(event_bus):
+        event_bus = get_event_bus()
+    if _is_depends(postgres_tool):
+        postgres_tool = get_postgres_tool(event_bus)
+    if _is_depends(vector_tool):
+        vector_tool = get_vector_tool(event_bus)
+    if _is_depends(s3_tool):
+        s3_tool = get_s3_tool(event_bus)
+    if _is_depends(metadata_service):
+        metadata_service = get_metadata_service(event_bus=event_bus)
+    if _is_depends(vector_service):
+        vector_service = get_vector_service(event_bus=event_bus)
+    if _is_depends(video_service):
+        video_service = get_video_service(s3_tool=s3_tool, event_bus=event_bus)
+    if _is_depends(event_service):
+        event_service = get_event_service(event_bus=event_bus)
+    if _is_depends(report_service):
+        report_service = get_report_service(event_bus=event_bus)
     
-    # Initialize registries on first call (thread-safe via GIL for simple flag check)
+    # Initialize registries on first call
     _initialize_registries(
-        event_bus, postgres_tool, milvus_tool, s3_tool,
+        event_bus, postgres_tool, vector_tool, s3_tool,
         metadata_service, vector_service, video_service,
         event_service, report_service
     )

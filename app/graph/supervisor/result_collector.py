@@ -22,31 +22,38 @@ class ResultCollector:
         if not getattr(context, "evidence_bundle", None):
             context.evidence_bundle = EvidenceBundle()
             
-        if agent_name in ["metadata_agent", "vector_agent", "evidence_agent"]:
-            # Handle EvidenceAgent which returns its own bundle
-            if hasattr(result, "bundle") and result.bundle:
-                for ev in result.bundle.evidence:
+        # Update context confidence_score if result carries a positive overall confidence score
+        if hasattr(result, "confidence") and result.confidence:
+            c = result.confidence
+            conf_val = getattr(c, "overall", c) if hasattr(c, "overall") else (c if isinstance(c, (int, float)) else 0.0)
+            if isinstance(conf_val, (int, float)) and conf_val > 0:
+                context.confidence_score = float(conf_val)
+
+        # Handle agents that return an EvidenceBundle
+        if hasattr(result, "bundle") and getattr(result, "bundle", None):
+            for ev in result.bundle.evidence:
+                context.evidence_bundle.add_evidence(ev)
+                
+        # Handle agents that return a raw list of Evidence objects
+        evidence = getattr(result, "evidence", None)
+        if evidence:
+            for ev in evidence:
+                if hasattr(ev, "generate_hash"):
                     context.evidence_bundle.add_evidence(ev)
-                    
-            evidence = getattr(result, "evidence", None)
-            if evidence:
-                for ev in evidence:
-                    if hasattr(ev, "generate_hash"):
-                        context.evidence_bundle.add_evidence(ev)
-                    else:
-                        try:
-                            ts = datetime.fromisoformat(ev.timestamp.replace("Z", "+00:00")) if ev.timestamp else datetime.now(timezone.utc)
-                        except (ValueError, AttributeError) as e:
-                            logger.warning(f"Failed to parse timestamp for evidence from {agent_name}: {e}")
-                            ts = datetime.now(timezone.utc)
-                            
-                        adapted_ev = MetadataEvidence(
-                            evidence_id=str(uuid.uuid4()),
-                            source=agent_name,
-                            confidence=getattr(ev, "confidence", 1.0),
-                            timestamp=ts,
-                            trace_id=get_execution_id() or get_conversation_id(),
-                            metadata={"camera_id": ev.camera_id, "description": ev.description}
-                        )
-                        context.evidence_bundle.add_evidence(adapted_ev)
+                else:
+                    try:
+                        ts = datetime.fromisoformat(ev.timestamp.replace("Z", "+00:00")) if ev.timestamp else datetime.now(timezone.utc)
+                    except (ValueError, AttributeError) as e:
+                        logger.warning(f"Failed to parse timestamp for evidence from {agent_name}: {e}")
+                        ts = datetime.now(timezone.utc)
+                        
+                    adapted_ev = MetadataEvidence(
+                        evidence_id=str(uuid.uuid4()),
+                        source=agent_name,
+                        confidence=getattr(ev, "confidence", 1.0),
+                        timestamp=ts,
+                        trace_id=get_execution_id() or get_conversation_id(),
+                        metadata={"camera_id": getattr(ev, "camera_id", None), "description": getattr(ev, "description", "")}
+                    )
+                    context.evidence_bundle.add_evidence(adapted_ev)
 

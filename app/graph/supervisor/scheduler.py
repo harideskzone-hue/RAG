@@ -11,6 +11,8 @@ from app.graph.supervisor.telemetry import AgentEvent
 from app.schemas.context import VistaContext, AgentExecutionRecord
 
 
+from app.graph.supervisor.timeout_manager import TimeoutManager
+
 class Scheduler:
     """
     Executes agents based on the execution_groups defined in the plan.
@@ -18,13 +20,15 @@ class Scheduler:
     """
     def __init__(self, dispatcher: Dispatcher, retry_manager: RetryManager, 
                  failure_handler: FailureHandler, result_collector: ResultCollector,
-                 state_machine: StateMachine, event_bus: EventBus):
+                 state_machine: StateMachine, event_bus: EventBus,
+                 timeout_manager: TimeoutManager = None):
         self.dispatcher = dispatcher
         self.retry_manager = retry_manager
         self.failure_handler = failure_handler
         self.result_collector = result_collector
         self.state_machine = state_machine
         self.event_bus = event_bus
+        self.timeout_manager = timeout_manager or TimeoutManager()
 
     async def execute_groups(self, context: VistaContext):
         groups = context.execution_plan.execution_groups
@@ -54,7 +58,8 @@ class Scheduler:
                 break
                 
             try:
-                result = await self.dispatcher.dispatch(agent_name, context)
+                coro = self.dispatcher.dispatch(agent_name, context)
+                result = await self.timeout_manager.execute_with_timeout(coro)
                 self.result_collector.collect(agent_name, result, context)
                 
                 # Append to Ledger

@@ -8,14 +8,20 @@ from app.agents.evidence.agent import EvidenceAgent
 from app.agents.knowledge_graph.agent import KnowledgeGraphAgent
 from app.graph.supervisor.event_bus import EventBus
 
+from app.agents.time.agent import TimeAgent
+
 AGENT_METADATA = "metadata_agent"
 AGENT_VECTOR = "vector_agent"
 AGENT_VIDEO = "video_agent"
 AGENT_EVENT = "event_agent"
 AGENT_REASONING = "reasoning_agent"
 AGENT_EVIDENCE = "evidence_agent"
+AGENT_FUSION = "evidence_fusion_agent"
+AGENT_VERIFICATION = "verification_agent"
 AGENT_REPORT = "report_agent"
 AGENT_KG = "knowledge_graph_agent"
+AGENT_CONFIDENCE = "confidence_agent"
+AGENT_TIME = "time_agent"
 
 class AgentRegistry:
     """
@@ -30,14 +36,7 @@ class AgentRegistry:
             raise ValueError(f"Agent with name {agent.name} is already registered.")
         self._agents[agent.name] = agent
 
-    def register_default_agents(self, event_bus: EventBus):
-        self.register(MetadataAgent(event_bus))
-        self.register(VectorAgent(event_bus))
-        self.register(VideoAgent(event_bus))
-        self.register(EventAgent(event_bus))
-        self.register(ReasoningAgent())
-        self.register(EvidenceAgent(event_bus))
-        self.register(KnowledgeGraphAgent())
+
 
     def get_agent(self, name: str) -> BaseAgent | None:
         return self._agents.get(name)

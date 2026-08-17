@@ -17,7 +17,7 @@ class MetadataService:
         self.camera_repo = camera_repo
         self.alert_repo = alert_repo
         self.event_bus = event_bus
-        self._cache = {} # Mock Redis cache
+        self._cache = {} # Simple in-memory cache fallback
 
     async def get_camera_status(self, camera_id: str, context: VistaContext) -> Camera | None:
         start_time = time.time()

@@ -35,7 +35,12 @@ class StateMachine:
     def state(self) -> ExecutionState:
         return self._state
 
+    def reset(self):
+        self._state = ExecutionState.CREATED
+
     def transition_to(self, new_state: ExecutionState) -> bool:
+        if new_state == self._state:
+            return True
         if new_state in self._valid_transitions[self._state]:
             self._state = new_state
             return True

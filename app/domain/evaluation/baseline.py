@@ -8,11 +8,10 @@ class EvaluationBaseline(BaseModel):
     expected_score: EvaluationScore
     
 class BaselineRepository:
-    """Mock repository for retrieving expected baseline scores."""
+    """Repository for retrieving expected baseline scores."""
     @staticmethod
     def get_baseline(version: str) -> EvaluationBaseline:
-        return EvaluationBaseline(
-            baseline_id="default_baseline",
-            version=version,
-            expected_score=EvaluationScore(overall_score=90.0) # Baseline is 90/100
+        raise NotImplementedError(
+            "BaselineRepository requires a configured backend. "
+            "Production fake implementations have been removed."
         )

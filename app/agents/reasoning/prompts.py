@@ -4,7 +4,10 @@ Ensure your hypotheses are logically sound, grounded in the provided evidence, a
 Return your response in strictly valid JSON format matching the requested schema.
 """
 
-HYPOTHESIS_GENERATOR_USER_PROMPT = """Given the following correlations, gaps, and evidence from the Knowledge Graph:
+HYPOTHESIS_GENERATOR_USER_PROMPT = """User Question:
+{user_query}
+
+Given the following correlations, gaps, and evidence from the CCTV Knowledge Graph:
 
 Evidence:
 {evidence_aliases}
@@ -15,16 +18,21 @@ Correlations:
 Gaps:
 {gaps}
 
-Generate plausible hypotheses explaining the events.
+Generate plausible hypotheses and a direct, helpful, grounded answer to the User Question.
 
 CRITICAL CONSTRAINTS:
 - Return ONLY valid JSON matching the schema below.
 - Generate claims ONLY from the supplied evidence.
+- State ONLY physical, observable facts present in the evidence (clothing, location, physical action).
+- NEVER speculate on intent, motive, or criminal behavior (e.g., DO NOT say "intent to steal", "surveillance", or "unauthorized activity") unless explicitly stated in the evidence text.
+- If the user asks a general existence query, state the existence and physical description of each person objectively.
 - Every claim MUST cite at least one evidence ID.
 - Evidence IDs MUST exactly match the UUIDs supplied in the Evidence list above.
 - NEVER invent, modify, abbreviate, or alias an evidence ID.
+- Format all timestamps as clean relative video time (e.g. `00:26 (26.6s)` or `01:09 (69.2s)`). NEVER output raw Unix epoch strings like `1970-01-01...`.
+- If providing a table, use properly formatted multi-line markdown tables.
 - Do not copy instructional text as a claim.
-- `answer` MUST be a string providing a summary.
+- `answer` MUST be a string providing a objective summary.
 - `claims` MUST be an array.
 - each claim MUST contain exactly: `statement`, `evidence_ids`, `confidence`, `support_type`.
 - unsupported facts MUST be placed in uncertainties or omitted.

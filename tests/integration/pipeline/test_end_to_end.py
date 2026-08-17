@@ -34,7 +34,7 @@ from app.services.repositories.person_repository import PersonRepository
 from app.services.repositories.vehicle_repository import VehicleRepository
 from app.services.vector_service import VectorService
 from app.services.video_service.service import VideoService
-from app.services.video_service.vlm_adapter import GeminiAdapter
+
 
 # Tools
 from app.tools.metadata.postgres_tool import PostgresTool
@@ -62,7 +62,8 @@ def supervisor():
     # 4. Services
     metadata_service = MetadataService(camera_repo, alert_repo, event_bus)
     vector_service = VectorService(person_repo, vehicle_repo, event_bus)
-    video_service = VideoService(s3_tool, GeminiAdapter(), event_bus)
+    from app.infrastructure.llm.model_registry import ModelRegistry
+    video_service = VideoService(s3_tool, ModelRegistry.get_client(), event_bus)
     event_service = EventService(event_bus)
     report_service = ReportService(event_bus)
     

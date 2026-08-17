@@ -20,7 +20,11 @@ class MemoryUpdatePolicy:
         if not existing_memory:
             return MemoryUpdateAction.KEEP
         
-        if getattr(new_observation, "confidence", 1.0) > getattr(existing_memory, "confidence", 1.0):
+        def _conf(obj):
+            c = getattr(obj, "confidence", 1.0)
+            return getattr(c, "overall", c) if hasattr(c, "overall") else (c if isinstance(c, (int, float)) else 1.0)
+        
+        if _conf(new_observation) > _conf(existing_memory):
             return MemoryUpdateAction.UPDATE
             
         return MemoryUpdateAction.KEEP

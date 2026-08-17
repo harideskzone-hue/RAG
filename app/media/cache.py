@@ -8,7 +8,7 @@ class VideoCache:
     Key is based on camera, timestamp, duration, and prompt.
     """
     def __init__(self):
-        self._cache = {} # Mock Redis
+        self._cache = {} # Simple in-memory cache fallback
         
     def _generate_key(self, camera_id: str, start_time: str, duration: int, prompt: str) -> str:
         content = f"{camera_id}_{start_time}_{duration}_{prompt}"

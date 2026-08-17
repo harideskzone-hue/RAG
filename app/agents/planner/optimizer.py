@@ -1,4 +1,4 @@
-from app.schemas.context import ExecutionPlan
+from app.schemas.context import ExecutionPlan, ExecutionGroup
 from app.agents.registry import AgentRegistry
 
 class CostOptimizer:
@@ -37,7 +37,7 @@ class CostOptimizer:
         for group in plan.execution_groups:
             new_group = [a for a in group if a in optimized_agents]
             if new_group:
-                new_groups.append(new_group)
+                new_groups.append(ExecutionGroup(agents=new_group))
         plan.execution_groups = new_groups
         
         # Prune tasks if they exist

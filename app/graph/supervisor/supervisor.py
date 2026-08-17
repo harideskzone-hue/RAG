@@ -45,6 +45,9 @@ class Supervisor:
         self.response_coordinator = ResponseCoordinator()
 
     async def run(self, context: VistaContext) -> dict[str, Any]:
+        """Execute the agent graph based on the request context."""
+        self.state_machine.reset()
+        # Initialize Intent Classifier with ModelRegistry-provided client.
         """
         Main entry point for executing a validated plan.
         Auto-generates an execution plan if not provided.
@@ -52,14 +55,37 @@ class Supervisor:
         if context.execution_plan is None:
             from app.agents.intent.classifier import HybridIntentClassifier
             from app.agents.planner.planner import ExecutionPlanner
+            from app.infrastructure.llm.model_registry import ModelRegistry
+            import time
+            from app.schemas.context import AgentExecutionRecord
             
-            classifier = HybridIntentClassifier(llm_client=self.llm_client)
+            start_time = time.time()
+            intent_client = ModelRegistry.get_client(role="intent")
+            classifier = HybridIntentClassifier(llm_client=intent_client)
             intent_result = await classifier.classify(context.current_query)
             context.results["intent_agent"] = intent_result
             if hasattr(intent_result, 'query_intent'):
                 context.query_intent = intent_result.query_intent
-            planner = ExecutionPlanner(llm_client=self.llm_client)
+            
+            intent_latency = (time.time() - start_time) * 1000
+            if not hasattr(context, "execution_ledger") or context.execution_ledger is None:
+                context.execution_ledger = []
+            context.execution_ledger.append(AgentExecutionRecord(
+                agent_name="intent_agent",
+                task_id="intent_classification",
+                status="completed",
+                execution_time_ms=intent_latency,
+                timestamp=time.time()
+            ))
+                
+            start_time = time.time()
+            planner_client = ModelRegistry.get_client(role="planner")
+            planner = ExecutionPlanner(llm_client=planner_client)
             context.execution_plan = await planner.plan(intent_result, context.current_query)
+            planner_latency = (time.time() - start_time) * 1000
+            
+            # Note: Planner is usually omitted from UI steps, but intent_agent is required
+            # for the UI to display "Query Understanding".
 
         self.state_machine.transition_to(ExecutionState.RUNNING)
         
@@ -87,9 +113,15 @@ class Supervisor:
                 from app.domain.policy.repository import InMemoryPolicyRepository
                 from app.domain.policy.context import PolicyContext
                 from app.domain.policy.decision import PolicyDecision
+                from app.domain.policy.budget import ExecutionBudget
                 
                 policy_engine = PolicyEngine(InMemoryPolicyRepository())
-                policy_context = PolicyContext(current_cost_usd=0.0, current_latency_ms=0.0, iteration_count=replans)
+                policy_context = PolicyContext(
+                    execution_mode=context.execution_mode.value if hasattr(context.execution_mode, 'value') else str(context.execution_mode),
+                    memory_profile="standard",
+                    budget=ExecutionBudget(),
+                    confidence_threshold=0.7,
+                )
                 explanation, trace = policy_engine.evaluate_plan(policy_context, context.execution_plan)
                 
                 if explanation.decision == PolicyDecision.REJECT:
@@ -118,7 +150,8 @@ class Supervisor:
                     context.execution_plan = explanation.validated_plan
                 else:
                     context.execution_plan.agents.extend(new_agents)
-                    context.execution_plan.execution_groups.append(new_agents)
+                    from app.schemas.context import ExecutionGroup
+                    context.execution_plan.execution_groups.append(ExecutionGroup(agents=new_agents))
                     
                 # Clear out next_actions so we don't loop forever
                 for result in context.results.values():
@@ -128,14 +161,15 @@ class Supervisor:
             if self.state_machine.state not in [ExecutionState.FAILED, ExecutionState.CANCELLED]:
                 self.state_machine.transition_to(ExecutionState.COMPLETED)
                 
-            # Compute final metrics
-            context.metrics.iterations = replans + 1
-            if context.execution_ledger:
-                context.metrics.total_latency_ms = sum(record.execution_time_ms for record in context.execution_ledger)
-                for record in context.execution_ledger:
-                    context.metrics.agent_utilization[record.agent_name] = context.metrics.agent_utilization.get(record.agent_name, 0) + 1
-                successes = sum(1 for r in context.execution_ledger if r.status == ExecutionState.COMPLETED)
-                context.metrics.success_rate = successes / len(context.execution_ledger)
+            # Compute final metrics (metrics field may not exist on all context versions)
+            if hasattr(context, 'metrics') and context.metrics is not None:
+                context.metrics.iterations = replans + 1
+                if context.execution_ledger:
+                    context.metrics.total_latency_ms = sum(record.execution_time_ms for record in context.execution_ledger)
+                    for record in context.execution_ledger:
+                        context.metrics.agent_utilization[record.agent_name] = context.metrics.agent_utilization.get(record.agent_name, 0) + 1
+                    successes = sum(1 for r in context.execution_ledger if r.status == ExecutionState.COMPLETED)
+                    context.metrics.success_rate = successes / len(context.execution_ledger)
             
             await self._persist_state(context)
             return self.response_coordinator.generate_response(context)
@@ -144,8 +178,9 @@ class Supervisor:
             self.cancellation_manager.cancel()
             await self._persist_state(context)
         except Exception as e:
-            # Ultimate failure catcher
-            self.state_machine.transition_to(ExecutionState.FAILED)
+            # Only transition to FAILED if not already in a terminal state
+            if self.state_machine.state not in [ExecutionState.FAILED, ExecutionState.COMPLETED, ExecutionState.CANCELLED]:
+                self.state_machine.transition_to(ExecutionState.FAILED)
             context.results["error"] = str(e)
             await self._persist_state(context)
             

@@ -7,9 +7,9 @@ from app.schemas.context import VistaContext, ExecutionPlan, UserContext
 from app.agents.intent.enums import Intent
 
 class MockMatch:
-    def __init__(self, score):
+    def __init__(self, score, id="mock"):
         self.score = score
-        self.id = "mock"
+        self.id = id
         from datetime import datetime, timezone
         self.timestamp = datetime.now(timezone.utc)
         self.camera_id = "cam"
@@ -21,7 +21,7 @@ class MockMatch:
 async def test_vector_agent_reranking():
     mock_service = AsyncMock()
     # Return out of order
-    mock_service.search_person.return_value = [MockMatch(score=0.5), MockMatch(score=0.9)]
+    mock_service.search_person.return_value = [MockMatch(score=0.5, id="mock1"), MockMatch(score=0.9, id="mock2")]
     
     from unittest.mock import MagicMock
     agent = VectorAgent(vector_service=mock_service, encoder=MagicMock())

@@ -38,13 +38,14 @@ async def test_mcp_unknown_tool(mcp_adapter, base_context):
 @pytest.mark.asyncio
 async def test_mcp_missing_required_arg(mcp_adapter, base_context):
     """Test 2: Missing required argument -> BLOCK"""
-    with pytest.raises(ValueError, match="Invalid arguments for search_person_occurrences:"):
+    base_context.current_query = "" # Clear to prevent auto-fill
+    with pytest.raises(ValueError, match="MCP Schema Validation failed"):
         await mcp_adapter.execute_tool("search_person_occurrences", {}, base_context) # missing description
 
 @pytest.mark.asyncio
 async def test_mcp_wrong_arg_type(mcp_adapter, base_context):
     """Test 3: Wrong argument type -> BLOCK"""
-    with pytest.raises(ValueError, match="Invalid arguments for search_person_occurrences:"):
+    with pytest.raises(ValueError, match="MCP Schema Validation failed"):
         await mcp_adapter.execute_tool("search_person_occurrences", {"description": {"complex": "object"}}, base_context)
 
 @pytest.mark.asyncio
@@ -200,6 +201,12 @@ async def test_mcp_e2e_pipeline(monkeypatch):
     
     reasoning_agent = agent_registry.get_agent("reasoning_agent")
     monkeypatch.setattr(reasoning_agent.coordinator.pipeline.hypothesis_generator, "llm", reasoning_client)
+    
+    # Mock EvidenceVerifier to always succeed to avoid LLM call fail-closed rule
+    from app.domain.models.reasoning import EngineResult
+    async def mock_verify(context, explanation, hypotheses):
+        return EngineResult(success=True, partial_output={"verified_hypotheses": [h.model_dump() if hasattr(h, "model_dump") else h for h in hypotheses]})
+    monkeypatch.setattr(reasoning_agent.coordinator.pipeline.evidence_verifier, "run_async", mock_verify)
     
     # 4. Run!
     result = await supervisor.run(ctx)
@@ -371,6 +378,12 @@ async def test_mcp_video_clip_e2e_pipeline(monkeypatch):
     
     reasoning_agent = agent_registry.get_agent("reasoning_agent")
     monkeypatch.setattr(reasoning_agent.coordinator.pipeline.hypothesis_generator, "llm", reasoning_client)
+    
+    # Mock EvidenceVerifier to always succeed to avoid LLM call fail-closed rule
+    from app.domain.models.reasoning import EngineResult
+    async def mock_verify(context, explanation, hypotheses):
+        return EngineResult(success=True, partial_output={"verified_hypotheses": [h.model_dump() if hasattr(h, "model_dump") else h for h in hypotheses]})
+    monkeypatch.setattr(reasoning_agent.coordinator.pipeline.evidence_verifier, "run_async", mock_verify)
     
     # 4. Run!
     result = await supervisor.run(ctx)

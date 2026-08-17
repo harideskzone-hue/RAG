@@ -1,20 +1,24 @@
-const BASE_URL = "http://localhost:8000/api/v1";
+const BASE_URL = "/api/v1";
 
 /**
- * Retrieve the auth token.
- * In development, a token can be set via the browser console:
- *   sessionStorage.setItem("vista_token", "<your_jwt>");
- * In production, this should come from a proper login/OAuth flow.
+ * Development authentication check.
+ * Strictly local dev helper. In production, dev fallback is disabled.
  */
-function getAuthToken() {
-    const token = sessionStorage.getItem("vista_token");
-    if (!token) {
-        console.warn(
-            "No auth token found. Set one with: " +
-            'sessionStorage.setItem("vista_token", "<your_jwt>")'
-        );
+export function getDevAuthToken() {
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    
+    if (isLocalhost) {
+        const validToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXZfdXNlciIsInJvbGUiOiJhZG1pbiIsImFsbG93ZWRfY2FtZXJhcyI6WyJjYW1fMDEiLCJDQU1fMDIiLCJDQU1fMDMiXSwiZXhwIjoxNzg2NjgyNzE4fQ.Phn7_Z7lTtVxZ8L1hmzN6JvpOY-MYgzuUuLnqDaWYFg";
+        let token = sessionStorage.getItem("vista_dev_token");
+        if (!token || token.includes("dev_sig")) {
+            token = validToken;
+            sessionStorage.setItem("vista_dev_token", token);
+        }
+        return { token, isDevMode: true };
     }
-    return token;
+    
+    const userToken = sessionStorage.getItem("vista_token");
+    return { token: userToken, isDevMode: false };
 }
 
 export async function checkHealth() {
@@ -28,13 +32,10 @@ export async function checkHealth() {
     }
 }
 
-export async function sendChatQuery(query) {
-    const token = getAuthToken();
+export async function sendChatQuery(query, executionMode = "simple") {
+    const { token, isDevMode } = getDevAuthToken();
     if (!token) {
-        throw new Error(
-            "Authentication required. Set a token with: " +
-            'sessionStorage.setItem("vista_token", "<your_jwt>")'
-        );
+        throw new Error("Authentication required. Please log in with a valid JWT token.");
     }
 
     try {
@@ -46,19 +47,19 @@ export async function sendChatQuery(query) {
             },
             body: JSON.stringify({
                 query: query,
-                conversation_id: "dashboard-session"
+                conversation_id: "dashboard-session",
+                execution_mode: executionMode
             })
         });
         
         if (!res.ok) {
             const err = await res.json();
-            throw new Error(err.detail || "API Error");
+            throw new Error(err.detail || `API Error (${res.status})`);
         }
         
         return await res.json();
     } catch (e) {
-        console.error("Chat Error:", e);
+        console.error("Chat API Error:", e);
         throw e;
     }
 }
-
