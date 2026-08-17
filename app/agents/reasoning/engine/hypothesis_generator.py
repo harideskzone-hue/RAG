@@ -18,6 +18,26 @@ class HypothesisGenerator:
         
         if self.llm:
             try:
+                # Check for active security incidents in metadata
+                from pathlib import Path
+                incident_lines = []
+                try:
+                    meta_dir = Path("dataset/metadata")
+                    if meta_dir.exists():
+                        for mf in meta_dir.glob("*.json"):
+                            with open(mf) as f:
+                                m_data = json.load(f)
+                            if m_data.get("active_incident"):
+                                inc = m_data["active_incident"]
+                                incident_lines.append(f"• CRITICAL SECURITY INCIDENT: {inc.get('title', 'Robbery')} - {inc.get('description', '')} (Time Window: {inc.get('start_time_sec', 0)}s - {inc.get('end_time_sec', 10)}s | Suspect: {inc.get('suspect_track_id', 'P001')})")
+                            for ev in m_data.get("events", []):
+                                if ev.get("event_type") == "SECURITY_INCIDENT":
+                                    incident_lines.append(f"• EVENT: {ev.get('title', 'Security Incident')} - {ev.get('description', '')}")
+                except Exception:
+                    pass
+
+                incident_context_str = "\n".join(incident_lines) if incident_lines else "No critical security alert active."
+
                 # Format evidence context directly with UUIDs
                 evidence_lines = []
                 valid_uuids = set()
@@ -44,6 +64,7 @@ class HypothesisGenerator:
                         {"role": "system", "content": HYPOTHESIS_GENERATOR_SYSTEM_PROMPT},
                         {"role": "user", "content": HYPOTHESIS_GENERATOR_USER_PROMPT.format(
                             user_query=context.query or "Investigate detected persons in CCTV footage.",
+                            incident_context=incident_context_str,
                             correlations=correlations_str, 
                             gaps=gaps_str,
                             evidence_aliases=evidence_str

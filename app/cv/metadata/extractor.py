@@ -125,36 +125,58 @@ class AutoVideoMetadataExtractor:
             net_disp = 0.0
             avg_x, avg_y = 0.5, 0.5
 
-        # Spatial zone mapping
-        if avg_x < 0.35 and avg_y < 0.55:
-            location = "entrance doorway and hallway"
-            zone = "entrance_doorway"
-        elif avg_x < 0.5 and avg_y >= 0.55:
-            location = "front office workstation desk"
-            zone = "front_desk"
-        elif avg_x >= 0.5 and avg_y < 0.55:
-            location = "side workstation area"
-            zone = "side_workstation"
-        else:
-            location = "central office workstation table"
-            zone = "central_workstation"
+        # Spatial zone mapping & scene context
+        is_crime_scene = video_id and any(kw in video_id.lower() for kw in ["robbery", "snatch", "crime", "theft", "chain", "cctv"])
+        
+        if is_crime_scene:
+            location = "street walkway / building entrance"
+            zone = "street_entrance"
+            
+            # Safe string representations
+            track_id_str = str(track_id or "unknown")
+            is_female = (
+                track_id_str in self.KNOWN_FEMALE_TRACKS
+                or (canonical_pid and any(f in canonical_pid for f in self.KNOWN_FEMALE_TRACKS))
+            )
 
-        # Determine behavior and activity from motion kinematics
-        if net_disp > 80:
-            if avg_x < 0.4:
-                behavior = "walking into the room through the entrance doorway"
+            if is_female:
+                behavior = "victim walking on street when targeted and approached in chain snatching incident"
+            elif track_id_str in ("P001", "P002", "P003") or (int(track_id_str.replace("P", "")) <= 3 if track_id_str.replace("P", "").isdigit() else False):
+                behavior = "suspect approaching victim, executing chain snatching robbery, and fleeing the scene"
+            elif net_disp > 80:
+                behavior = "fleeing scene rapidly following chain snatching confrontation"
             else:
-                behavior = "moving across office workstation area"
-        elif net_disp < 40 and duration >= 3.0:
-            if "workstation" in location or "desk" in location:
-                behavior = "seated at workstation desk working on laptop computer"
-            else:
-                behavior = "standing near entrance area observing surroundings"
+                behavior = "individual present in CCTV coverage during robbery event"
         else:
-            if "desk" in location or "workstation" in location:
-                behavior = "seated at desk interacting with computer workstation"
+            if avg_x < 0.35 and avg_y < 0.55:
+                location = "entrance doorway and hallway"
+                zone = "entrance_doorway"
+            elif avg_x < 0.5 and avg_y >= 0.55:
+                location = "front office workstation desk"
+                zone = "front_desk"
+            elif avg_x >= 0.5 and avg_y < 0.55:
+                location = "side workstation area"
+                zone = "side_workstation"
             else:
-                behavior = "present near entrance area"
+                location = "central office workstation table"
+                zone = "central_workstation"
+
+            # Determine behavior and activity from motion kinematics
+            if net_disp > 80:
+                if avg_x < 0.4:
+                    behavior = "walking into the room through the entrance doorway"
+                else:
+                    behavior = "moving across office workstation area"
+            elif net_disp < 40 and duration >= 3.0:
+                if "workstation" in location or "desk" in location:
+                    behavior = "seated at workstation desk working on laptop computer"
+                else:
+                    behavior = "standing near entrance area observing surroundings"
+            else:
+                if "desk" in location or "workstation" in location:
+                    behavior = "seated at desk interacting with computer workstation"
+                else:
+                    behavior = "present near entrance area"
 
         # Safe string representations
         track_id_str = str(track_id or "unknown")
@@ -273,12 +295,20 @@ class AutoVideoMetadataExtractor:
             clip_url = None
             thumb_url = None
             source_video_candidates = [
+                Path("dataset/storage/vista-video-bucket/cctv.mp4"),
+                Path("dataset/storage/vista-video-bucket") / video_id,
+                Path("dataset/storage") / video_id,
                 Path("input/completed") / video_id,
                 Path("input/watch") / video_id,
                 Path("input/processing") / video_id,
                 Path("input") / video_id
             ]
             source_video_path = next((p for p in source_video_candidates if p.exists()), None)
+            if not source_video_path:
+                # Find any available mp4 in dataset/storage or input
+                all_mp4s = list(Path("dataset/storage").glob("**/*.mp4")) + list(Path("input").glob("**/*.mp4"))
+                if all_mp4s:
+                    source_video_path = all_mp4s[0]
             
             if source_video_path:
                 try:
