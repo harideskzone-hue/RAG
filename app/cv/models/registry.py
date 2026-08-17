@@ -11,8 +11,9 @@ class ModelRegistry:
     """
 
     def __init__(self, config_overrides: dict = None):
+        default_model_dir = str(Path(__file__).resolve().parent.parent.parent.parent / "models")
         self.config = {
-            "model_dir": os.environ.get("CV_MODEL_DIR"),
+            "model_dir": os.environ.get("CV_MODEL_DIR") or default_model_dir,
             "detector_model": os.environ.get("CV_DETECTOR_MODEL", "yolo26n.pt"),
             "device": os.environ.get("CV_DEVICE", "cpu"),
             "tracker_config": os.environ.get("CV_TRACKER_CONFIG", "bytetrack.yaml")

@@ -231,9 +231,15 @@ class IngestionManager:
                     if person_meta_file.exists():
                         try:
                             with open(person_meta_file, "r") as pf:
-                                person_data = json.load(pf)
+                                loaded = json.load(pf)
+                                if isinstance(loaded, dict):
+                                    person_data.update(loaded)
                         except Exception:
                             pass
+                    person_data.setdefault("tracks", [])
+                    person_data.setdefault("evidence_ids", [])
+                    person_data.setdefault("cameras", [])
+
                     if track_id not in person_data["tracks"]:
                         person_data["tracks"].append(track_id)
                     for eid in saved_ev_ids:
