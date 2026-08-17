@@ -1,84 +1,204 @@
-# VISTA AI
+# 🛡️ VISTA AI — Video Intelligence & Surveillance Thinking Agent
 
-VISTA (Video Intelligence & Surveillance Thinking Agent) AI is a multi-agent AI system designed to intelligently monitor, search, and analyze large-scale physical security environments.
+VISTA AI is an enterprise-grade, multi-agent Computer Vision and Agentic RAG platform designed for 24/7 physical security, multi-camera person tracking (Re-ID), automated event metadata extraction, and forensic video investigation.
 
-This project is currently undergoing a strict hardening and refactoring process (Phase A) before production model integration (Phase B).
+---
 
-## Current Project Status
+## 🏛️ End-to-End System Architecture
 
-The codebase is strictly gated into three states to prevent unvalidated claims:
+```
+                        VISTA AI COMPLETE PIPELINE ARCHITECTURE
 
-### ✅ IMPLEMENTED & VALIDATED (Model-Free)
-The following components have been fully implemented, structurally hardened, and mathematically validated using a model-free adversarial framework:
-- **Supervisor Orchestration**: Event-driven execution of specialized agents (Metadata, Vector, Report).
-- **Core Security invariants**: JWT production enforcement, Role-Based Access Control (RBAC), and strict camera authorization pushed down to the retrieval boundaries.
-- **Data Stores**: Native in-memory/JSON implementations for Vector Store, Checkpoint Store, and Document Store.
-- **Vector Math**: Strict L2-to-Similarity conversion, bounding box schema enforcement.
-- **Fail-Safe Integrity**: Strict validation against hallucinated evidence, mock tool failures, and deterministic failure policies.
-
-### 🟡 IMPLEMENTED (Model-Blocked / Awaiting Phase B)
-The following code exists in the repository but is explicitly blocked from execution during Phase A to ensure foundational stability:
-- **Real LLM Integration**: Gemini, SmolVLM, Qwen, Ollama, and external reasoning chains.
-- **LangGraph Integration**: The LangGraph builder (`app/graph/builder.py`) scaffolding.
-- **Intent Agent**: Temporarily decoupled from the DAG pending Phase B integration.
-
-### 🔴 UNVALIDATED (Removed or Pending Refactor)
-- Claims of "Production Observability" (OpenTelemetry, Jaeger, Prometheus) have been removed until explicitly validated.
-- Claims of distributed processing have been removed until actual cloud deployment is validated.
-
-## Architecture
-
-```mermaid
-graph TD
-    Client[Client Application] --> API[FastAPI Gateway]
-    API --> Supervisor[Supervisor Agent]
-    
-    Supervisor --> Planner[Planner Agent]
-    
-    Supervisor --> EventBus{Event Bus}
-    
-    EventBus --> MetaAgent[Metadata Agent]
-    EventBus --> VecAgent[Vector Agent]
-    EventBus --> ReportAgent[Report Agent]
-    
-    MetaAgent --> EvidenceAgent[Evidence Agent]
-    VecAgent --> EvidenceAgent
-    
-    EvidenceAgent --> ConfidenceEngine[Confidence Engine]
-    ConfidenceEngine --> Supervisor
+  ┌─────────────────────────┐
+  │  24/7 RTSP / IP CAM     │
+  │     (Hikvision/Dahua)   │
+  └────────────┬────────────┘
+               │ Live RTSP Feed (H.264/H.265)
+               ▼
+  ┌─────────────────────────┐
+  │  RTSP Stream Chunker    │ ──► [input/recording/temp_*.mp4]
+  │  (10-minute slicing)    │ ──► Atomic Promotion (st_size > 1024)
+  └────────────┬────────────┘
+               │ [input/watch/<cam_id>_<timestamp>.mp4]
+               ▼
+  ┌─────────────────────────┐
+  │  Auto Ingestion Daemon  │ ──► Compute SHA-256 & Telemetry
+  │  (State Controller)     │ ──► Transitions: READY ➔ PROCESSING ➔ CV_COMPLETE ➔ ...
+  └────────────┬────────────┘
+               │
+               ▼
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                       COMPUTER VISION PIPELINE                         │
+  │                                                                        │
+  │  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐  │
+  │  │  YOLO26n /       │ ──►│   ByteTrack /    │ ──►│ Crop Quality Gate│  │
+  │  │  PeopleNet       │    │   BoT-SORT       │    │ Blur/Skin/Aspect │  │
+  │  └──────────────────┘    └──────────────────┘    └─────────┬────────┘  │
+  │                                                            │           │
+  │  ┌──────────────────┐    ┌──────────────────┐              │           │
+  │  │ IdentityResolver │ ◄──│ OSNet / SOLIDER  │ ◄────────────┘           │
+  │  │ (0.82 / 0.05)    │    │ 512-D Embedding  │                          │
+  │  └────────┬─────────┘    └──────────────────┘                          │
+  └───────────┼────────────────────────────────────────────────────────────┘
+              │
+              │ (Resolved Canonical Identities: MATCHED / NEW / UNRESOLVED)
+              ▼
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                     MULTI-STORE PERSISTENCE LAYER                      │
+  │                                                                        │
+  │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌───────┐ │
+  │  │ PostgreSQL   │    │  MongoDB     │    │ Qdrant /     │    │Object │ │
+  │  │ Source Truth │    │  Telemetry   │    │ Vector Store │    │Storage│ │
+  │  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘    └───┬───┘ │
+  └─────────┼───────────────────┼───────────────────┼────────────────┼─────┘
+            │                   │                   │                │
+            └───────────────────┴─────────┬─────────┴────────────────┘
+                                          │
+                                          ▼
+                             ┌─────────────────────────┐
+                             │    Cross-Store Audit    │
+                             │  (Referential Checklist)│
+                             └────────────┬────────────┘
+                                          │
+                               ┌──────────┴──────────┐
+                               ▼                     ▼
+                        [AUDIT PASS]           [AUDIT FAIL]
+                               │                     │
+                    Post-Verification Safe       Quarantine to
+                     Video Cleanup (retain      [input/failed/]
+                      crops & metadata)
+                               │
+                               ▼
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                    AGENTIC RAG REASONING & SEARCH                      │
+  │                                                                        │
+  │  User Query (React UI / API) ➔ Hybrid Intent Classifier                 │
+  │                                      │                                 │
+  │                                      ▼                                 │
+  │                         Execution Plan (Deterministic)                 │
+  │                                      │                                 │
+  │                                      ▼                                 │
+  │                          Metadata & Evidence Fusion                    │
+  │                                      │                                 │
+  │                                      ▼                                 │
+  │                       VerifiedResultContract (Contract)                │
+  │                                      │                                 │
+  │                                      ▼                                 │
+  │                        LLM Reasoning (Synthesizer)                     │
+  │                                      │                                 │
+  │                                      ▼                                 │
+  │                    Grounding Validator (0 Hallucinations)              │
+  └──────────────────────────────────────┬─────────────────────────────────┘
+                                         │
+                                         ▼
+                            FastAPI Server (:8000)
+                                         │
+                                         ▼
+                            React Dashboard (:5173)
 ```
 
-## Quick Start (Model-Free Mode)
+---
 
-The system currently runs in a locked-down `native` mode that mocks infrastructure and external model calls to validate API contracts and system invariants.
+## ⚙️ Computer Vision & Re-ID Stack
 
-### 1. Clone the repository
+| Component | Model / Algorithm | Description |
+|---|---|---|
+| **Person Detection** | **YOLO26n / NVIDIA PeopleNet** | High-precision bounding box detection tuned for CCTV surveillance. |
+| **Multi-Object Tracking** | **ByteTrack / BoT-SORT** | Kalman Filtering + Global Motion Compensation to maintain continuous trajectories (`P001`, `P002`...). |
+| **Crop Quality Gate** | **Laplacian Sharpness & Skin-Tone Filter** | Filters out blurry, tiny, or dark artifacts to select top 5–8 high-resolution face crops per person. |
+| **Person Re-ID** | **OSNet MSMT17 / SOLIDER TAO Re-ID** | Extracts 512-dimensional L2-normalized feature vectors for multi-camera person search. |
+| **Identity Resolver** | **Cosine Matcher (0.82 / 0.05)** | Matches tracklets across cameras/time (`MATCHED`, `NEW`, `UNRESOLVED`). |
+
+---
+
+## 🛠️ Step-by-Step Installation & Run Guidance
+
+### 1. Prerequisites
+- **Python**: `3.10+`
+- **Node.js**: `18.0+` (for React Dashboard)
+- **OS**: macOS, Linux, or Windows (WSL2)
+
+---
+
+### 2. Environment Setup
+
 ```bash
-git clone https://github.com/vista-ai/vista_agentic_ai.git
-cd vista_agentic_ai
+# 1. Clone repository
+git clone https://github.com/harideskzone-hue/RAG.git
+cd RAG
+
+# 2. Create Python virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# 3. Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-### 2. Native Setup
-Run the application completely locally without Docker. Infrastructure (PostgreSQL, Milvus, Redis) and Models are automatically gracefully mocked out.
+---
+
+### 3. Configuration (`.env`)
+
+Ensure your `.env` file contains valid model and API settings:
 
 ```bash
-make setup
-make run
+CV_MODEL_DIR=models
+CV_DETECTOR_MODEL=yolo26n.pt
+CV_DEVICE=cpu
+CV_TRACKER_CONFIG=bytetrack.yaml
+
+LLM_PROVIDER=groq
+GROQ_API_KEY=your_groq_api_key_here
+REASONING_PROVIDER=groq
+
+POSTGRES_URI=postgresql+asyncpg://vista:vista123@localhost:5433/vista_db
+MONGO_URI=mongodb://localhost:27017/
+QDRANT_HOST=localhost
+QDRANT_PORT=6333
 ```
-The API will be available at `http://localhost:8000`.
 
-## Testing
+---
 
-The system enforces strict architectural boundaries using a model-free validation suite:
+### 4. Launch VISTA AI Server & Dashboard
+
+To start both the FastAPI backend and React frontend simultaneously:
 
 ```bash
-# Run structural adversarial tests
-PYTHONPATH=. .venv/bin/pytest tests/unit/ tests/adversarial/
-
-# Run the Phase A Model-Free E2E Acceptance Gate
-PYTHONPATH=. .venv/bin/python scripts/validation/validate_codebase_model_free.py
+./run_vista.sh
 ```
 
-## License
+- **Backend API**: `http://localhost:8000` (Health: `http://localhost:8000/api/v1/health`)
+- **React Dashboard**: `http://localhost:5173`
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
+
+## 🚀 24/7 Production Operations & CLI Utilities
+
+### A. Ingest Any Custom Video Immediately
+```bash
+# Process a video clip with full CV extraction, Re-ID, and Audit:
+python3 scripts/run_fast_ingest.py
+```
+
+### B. Connect a Live 24/7 RTSP / NVR Stream
+```bash
+# Stream from IP Camera or NVR and slice into 10-minute segments:
+python3 scripts/cctv_stream_chunker.py "rtsp://admin:password@192.168.1.100:554/Streaming/Channels/101" cam_entrance_01
+```
+
+### C. Launch 24/7 Auto-Ingestion Watch Daemon
+```bash
+# Automatically ingests any video dropped into input/watch/:
+python3 scripts/auto_ingest_daemon.py
+```
+
+### D. Verify Agentic RAG Pipeline (Zero Hallucination)
+```bash
+python3 scripts/verify_agentic_rag.py
+```
+
+### E. Run Cross-Store Referential Audit
+```bash
+python3 scripts/cross_store_audit.py
+```
