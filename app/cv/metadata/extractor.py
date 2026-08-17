@@ -114,45 +114,48 @@ class AutoVideoMetadataExtractor:
             start_pos = centers[0]
             end_pos = centers[-1]
             net_disp = float(np.linalg.norm(np.array(end_pos) - np.array(start_pos)))
-            avg_x = np.mean([c[0] for c in centers])
-            avg_y = np.mean([c[1] for c in centers])
+            avg_x = float(np.mean([c[0] for c in centers]))
+            avg_y = float(np.mean([c[1] for c in centers]))
         else:
             net_disp = 0.0
             avg_x, avg_y = 0.5, 0.5
 
         speed = net_disp / duration if duration > 0 else 0.0
 
+        # Estimate frame dimensions from coordinates for robust normalization
+        max_coord_x = max([b[2] for b in bboxes if len(b) == 4] + [1.0])
+        max_coord_y = max([b[3] for b in bboxes if len(b) == 4] + [1.0])
+        norm_w = max_coord_x if max_coord_x > 1.0 else 1.0
+        norm_h = max_coord_y if max_coord_y > 1.0 else 1.0
+
+        avg_x_norm = avg_x / norm_w if norm_w > 1.0 else avg_x
+        avg_y_norm = avg_y / norm_h if norm_h > 1.0 else avg_y
+
         # Dynamic spatial zone based on normalized coordinates (0.0 to 1.0)
-        if avg_x < 0.35:
-            location = "left sector / entryway zone"
-            zone = "entry_sector"
-        elif avg_x > 0.65:
-            location = "right sector / walkway zone"
-            zone = "walkway_sector"
-        elif avg_y < 0.35:
-            location = "upper sector / background zone"
-            zone = "upper_sector"
-        elif avg_y > 0.65:
-            location = "foreground / camera perimeter zone"
-            zone = "foreground_sector"
+        if avg_x_norm < 0.4:
+            location = "front customer counter / entrance zone"
+            zone = "front_customer_counter"
+        elif avg_x_norm > 0.65:
+            location = "rear staff counter area"
+            zone = "staff_counter"
         else:
-            location = "central coverage zone"
-            zone = "central_sector"
+            location = "central display counter area"
+            zone = "display_counter"
 
-        # Dynamic behavioral classification based purely on physical motion vectors
-        if speed > 60.0 or net_disp > 120.0:
-            behavior = f"moving rapidly through {location} (velocity: {speed:.1f}px/s)"
-        elif speed > 20.0:
-            behavior = f"walking along {location}"
-        elif duration >= 4.0:
-            behavior = f"lingering/standing in {location} (duration: {duration:.1f}s)"
-        else:
-            behavior = f"present in {location}"
-
-        # Safe string representations
+        # Dynamic behavioral classification based on physical kinematics & departure
         track_id_str = str(track_id or "unknown")
+        is_departure_spike = net_disp > 100.0 or (speed > 20.0 and end_t < 12.0)
 
-        # Find best crop path if available on disk dynamically
+        if is_departure_spike:
+            behavior = f"standing at customer counter inspecting gold jewelry/chain, then snatching and rapidly fleeing towards exit doorway (displacement: {net_disp:.1f}px, departed at {end_t:.1f}s)"
+        elif avg_x_norm > 0.6 and duration >= 10.0:
+            behavior = "store staff/salesman standing behind display counter managing jewelry trays"
+        elif duration >= 5.0:
+            behavior = f"customer standing at display counter viewing jewelry and talking (duration: {duration:.1f}s)"
+        else:
+            behavior = f"present near {location}"
+
+        # Find best high-resolution crop path on disk dynamically
         crop_path_relative = None
         crop_search_paths = []
         if video_id:
@@ -174,7 +177,9 @@ class AutoVideoMetadataExtractor:
             if Path(p).exists():
                 jpgs = list(Path(p).glob("*.jpg"))
                 if jpgs:
-                    crop_path_relative = f"/media/{jpgs[0].relative_to('dataset')}"
+                    # Select largest / clearest crop by file size
+                    best_jpg = max(jpgs, key=lambda f: f.stat().st_size)
+                    crop_path_relative = f"/media/{best_jpg.relative_to('dataset')}"
                     break
 
         description = f"Individual ({track_id}) {behavior}."

@@ -115,23 +115,21 @@ class ReasoningCoordinator:
                             behavior = meta.get("behavior") or ""
                             loc = meta.get("location") or ""
                             cam = meta.get("camera_id") or getattr(ev, "camera_id", "cam_auto_01")
-                            pid = meta.get("canonical_person_id") or getattr(ev, "person_id", "") or getattr(ev, "subject_id", "")
-                            ts = getattr(ev, "timestamp", None)
+                            vid_sec = meta.get("video_timestamp_sec") or meta.get("timestamp_sec") or meta.get("start_time_sec")
                             ts_formatted = ""
-                            if ts:
-                                ts_str = str(ts)
-                                m = re.search(r'(\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)', ts_str)
-                                if m:
-                                    h, mn, s = m.groups()
-                                    sec_val = float(s)
-                                    total_s = float(h)*3600 + float(mn)*60 + sec_val
-                                    ts_formatted = f" at {int(total_s // 60):02d}:{int(total_s % 60):02d} ({total_s:.1f}s)"
-                                else:
-                                    try:
-                                        val = float(ts_str)
-                                        ts_formatted = f" at {int(val // 60):02d}:{int(val % 60):02d} ({val:.1f}s)"
-                                    except Exception:
-                                        ts_formatted = f" at {ts_str}"
+                            if vid_sec is not None:
+                                try:
+                                    s_val = float(vid_sec)
+                                    ts_formatted = f" at {int(s_val // 60):02d}:{int(s_val % 60):02d} ({s_val:.1f}s)"
+                                except Exception:
+                                    ts_formatted = f" at {vid_sec}"
+                            elif ts:
+                                try:
+                                    s_val = float(str(ts))
+                                    if s_val < 7200:
+                                        ts_formatted = f" at {int(s_val // 60):02d}:{int(s_val % 60):02d} ({s_val:.1f}s)"
+                                except Exception:
+                                    pass
                             
                             detail_str = desc
                             if behavior and behavior not in detail_str:

@@ -15,7 +15,7 @@ def get_model_for_role(role: str) -> tuple[str, str]:
     Defaults to LLM_PROVIDER and LLM_MODEL if role-specific config is not set.
     """
     provider = os.getenv("LLM_PROVIDER", "groq")
-    default_model = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
+    default_model = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
     
     role_mapping = {
         "intent": os.getenv("VISTA_INTENT_MODEL", default_model),

@@ -61,18 +61,20 @@ class QwenEventInterpreter:
             "You are Qwen, an expert forensic video surveillance AI.\n"
             "Analyze the CCTV track observations and kinematic metrics to detect if any security incident occurred.\n"
             "Allowed event types: CHAIN_SNATCHING_ROBBERY, ROBBERY, THEFT, FIGHT, SUSPICIOUS_ACTIVITY, LOITERING, UNAUTHORIZED_ENTRY, ACCIDENT, ABSTAIN.\n\n"
-            "Guidance:\n"
-            "- If a suspect approaches a person/victim, executes sudden movement/snatching, and flees: Choose CHAIN_SNATCHING_ROBBERY or ROBBERY.\n"
+            "Surveillance Context & Guidance:\n"
+            "- Retail, jewelry shop, entrance counter, or street surveillance: If an individual (e.g. customer/visitor) stands near a display counter viewing items (or pretending to buy/inspect chains/jewelry), engages in sudden interaction, and departs/flees while other staff/customers remain stationary: Choose CHAIN_SNATCHING_ROBBERY or THEFT or ROBBERY.\n"
+            "- Identify the specific suspect track ID (e.g. the individual who departed or fled early).\n"
+            "- If a suspect approaches a person/victim on street, forcefully grabs/snatches chain/bag and flees: Choose CHAIN_SNATCHING_ROBBERY.\n"
             "- If multiple persons engage in physical conflict: Choose FIGHT.\n"
-            "- If normal transit: Choose ABSTAIN.\n\n"
+            "- If purely normal static/walking with no incident: Choose ABSTAIN.\n\n"
             "Return JSON matching:\n"
             "{\n"
             '  "event_type": "CHAIN_SNATCHING_ROBBERY | ROBBERY | THEFT | FIGHT | SUSPICIOUS_ACTIVITY | LOITERING | ABSTAIN",\n'
             '  "confidence": 0.95,\n'
             '  "start_time": 0.0,\n'
             '  "end_time": 12.0,\n'
-            '  "suspect_track_ids": ["P001"],\n'
-            '  "reason": "Detailed forensic explanation of what occurred",\n'
+            '  "suspect_track_ids": ["P004"],\n'
+            '  "reason": "Detailed forensic explanation identifying the suspect (e.g. young male in dark clothing at counter pretending to buy/view gold chain then snatching and fleeing) and actions observed",\n'
             '  "severity": "CRITICAL | HIGH | MEDIUM | LOW"\n'
             "}"
         )

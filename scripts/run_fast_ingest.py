@@ -21,20 +21,27 @@ from scripts.auto_ingest_daemon import update_segment_state, compute_file_hash, 
 
 
 async def main():
-    video_filename = "chain_robbery_cctv.mp4"
     camera_id = "cam_auto_01"
     
-    # Locate video file
+    # Locate video file dynamically
     video_path = None
-    for d in [Path("input/failed"), Path("input/processing"), Path("input/watch"), Path("input/completed")]:
-        candidate = d / video_filename
-        if candidate.exists():
-            video_path = candidate
-            break
+    if len(sys.argv) > 1:
+        cand = Path(sys.argv[1])
+        if cand.exists():
+            video_path = cand
+
+    if not video_path:
+        for d in [Path("input/watch"), Path("input/processing"), Path("input/completed"), Path("input")]:
+            mp4s = list(d.glob("*.mp4"))
+            if mp4s:
+                video_path = mp4s[0]
+                break
             
     if not video_path:
-        print(f"Error: Video {video_filename} not found!")
+        print("Error: No MP4 video found in input folders!")
         return
+
+    video_filename = video_path.name
 
     print(f"1. Preparing video: {video_path}")
     proc_path = PROCESSING_DIR / video_filename
