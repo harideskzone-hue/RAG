@@ -26,7 +26,7 @@ export interface ExecutionStep {
 
 export interface ChatResponse {
   status: string;
-  detection_status: 'DETECTED' | 'EMPTY' | 'ABSTAINED' | 'ERROR';
+  detection_status: 'DETECTED' | 'EMPTY' | 'ABSTAINED' | 'ERROR' | 'CRITICAL_ALERT' | 'INCIDENT_ALERT';
   person_count: number;
   zone: string;
   evaluation_window?: string;

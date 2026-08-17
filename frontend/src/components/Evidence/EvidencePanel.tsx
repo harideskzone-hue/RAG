@@ -40,27 +40,40 @@ export function EvidencePanel({ selectedContract }: EvidencePanelProps) {
       </div>
 
       <div className="evidence-content-scroll">
-        {/* Primary Entrance CCTV Video Evidence Box */}
+        {/* Primary Entrance CCTV Video Evidence Box / 10s Sliced Incident Clip */}
         {mainClipUrl && (
-          <div className="scene-video-card">
+          <div className="scene-video-card" style={
+            (status === 'CRITICAL_ALERT' || status === 'INCIDENT_ALERT' || mainClipUrl.includes('/media/events/')) ? {
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(30, 27, 75, 0.4) 100%)',
+              border: '1px solid rgba(239, 68, 68, 0.5)',
+              boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)'
+            } : undefined
+          }>
             <div className="scene-video-header">
               <div className="scene-video-info">
-                <span className="scene-video-title">🎥 Entrance CCTV Video Evidence</span>
+                <span className="scene-video-title" style={
+                  (status === 'CRITICAL_ALERT' || status === 'INCIDENT_ALERT') ? { color: '#f87171', fontWeight: 'bold' } : undefined
+                }>
+                  {(status === 'CRITICAL_ALERT' || status === 'INCIDENT_ALERT' || mainClipUrl.includes('/media/events/')) ? '🚨 Sliced 10-Second Incident Video Clip' : '🎥 Entrance CCTV Video Evidence'}
+                </span>
                 <span className="scene-video-window">Evaluation Window: {windowStr}</span>
               </div>
               <button
                 type="button"
                 className="scene-play-btn"
+                style={
+                  (status === 'CRITICAL_ALERT' || status === 'INCIDENT_ALERT') ? { background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' } : undefined
+                }
                 onClick={() => setActiveVideoModal(mainClipUrl)}
               >
-                <Play size={13} fill="currentColor" /> Play Footage
+                <Play size={13} fill="currentColor" /> Play 10s Incident Clip
               </button>
             </div>
           </div>
         )}
 
         {/* State-Driven Evidence Content */}
-        {status === 'DETECTED' && evidence && evidence.length > 0 ? (
+        {(status === 'DETECTED' || status === 'CRITICAL_ALERT' || status === 'INCIDENT_ALERT') && evidence && evidence.length > 0 ? (
           <div className="evidence-section">
             <div className="section-title-row">
               <h3>Verified Person Gallery ({evidence.length})</h3>

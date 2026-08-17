@@ -42,12 +42,12 @@ def wipe_filesystem():
         dir_path.mkdir(parents=True, exist_ok=True)
         print(f"   ✓ Cleaned {d}/")
 
-    # Clean local sqlite db / checkpoints if present
-    for f in ["dataset/vista_local.db", "dataset/checkpoints.json", "dataset/vector_metadata.json"]:
-        file_path = PROJECT_ROOT / f
-        if file_path.exists():
-            file_path.unlink()
-            print(f"   ✓ Removed {f}")
+    # Clean local sqlite db / checkpoints / native vector stores if present
+    for pattern in ["vista_local.db", "checkpoints.json", "vector_metadata.json", "vectors_*.npy", "meta_*.json"]:
+        for f in (PROJECT_ROOT / "dataset").glob(pattern):
+            if f.exists():
+                f.unlink()
+                print(f"   ✓ Removed {f.name}")
 
 
 def wipe_databases():

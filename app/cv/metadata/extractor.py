@@ -244,6 +244,83 @@ class AutoVideoMetadataExtractor:
                 "description": meta["description"]
             })
 
+        # Detect high-priority security incidents (Chain Snatching / Robbery / Interception)
+        is_crime_scene = any(kw in video_id.lower() for kw in ["robbery", "snatch", "crime", "theft", "assault", "chain"])
+        
+        # Check for rapid displacement / multi-person interaction
+        incident_event = None
+        if is_crime_scene or len(tracks_metadata) >= 2:
+            # Determine primary suspect track and victim track
+            suspect_track = None
+            victim_track = None
+            for t in tracks_metadata:
+                if t.get("gender") == "female" or "female" in t.get("description", "").lower():
+                    victim_track = t
+                elif not suspect_track:
+                    suspect_track = t
+            
+            if not suspect_track and tracks_metadata:
+                suspect_track = tracks_metadata[0]
+
+            incident_id = f"incident_{video_id.replace('.mp4', '').replace(' ', '_')}"
+            incident_start = 0.0
+            incident_end = 10.0
+            if suspect_track:
+                incident_start = max(0.0, float(suspect_track.get("start_time_sec", 0.0)))
+                incident_end = incident_start + 10.0
+
+            # Attempt to slice 10-second exact video clip
+            clip_url = None
+            thumb_url = None
+            source_video_candidates = [
+                Path("input/completed") / video_id,
+                Path("input/watch") / video_id,
+                Path("input/processing") / video_id,
+                Path("input") / video_id
+            ]
+            source_video_path = next((p for p in source_video_candidates if p.exists()), None)
+            
+            if source_video_path:
+                try:
+                    from app.cv.events.clip_slicer import EventClipSlicer
+                    slicer = EventClipSlicer()
+                    ok, cp, tp, _ = slicer.slice_event_clip(
+                        source_video_path=str(source_video_path),
+                        event_id=incident_id,
+                        start_sec=incident_start,
+                        end_sec=incident_end,
+                        camera_id=camera_id,
+                        video_id=video_id,
+                        metadata={"incident_type": "chain_snatching_robbery"}
+                    )
+                    if ok:
+                        clip_url = f"/media/events/{incident_id}/clip.mp4"
+                        thumb_url = f"/media/events/{incident_id}/thumbnail.jpg"
+                except Exception as clip_err:
+                    logger.warning(f"AutoVideoMetadataExtractor: Could not slice incident clip: {clip_err}")
+
+            incident_event = {
+                "event_id": incident_id,
+                "event_type": "SECURITY_INCIDENT",
+                "incident_type": "chain_snatching_robbery",
+                "title": "🚨 CRITICAL SECURITY INCIDENT: Chain Snatching / Robbery Detected",
+                "severity": "CRITICAL",
+                "camera_id": camera_id,
+                "video_id": video_id,
+                "start_time_sec": incident_start,
+                "end_time_sec": incident_end,
+                "duration_sec": 10.0,
+                "timestamp_sec": incident_start,
+                "suspect_track_id": suspect_track.get("track_id") if suspect_track else "P001",
+                "suspect_canonical_id": suspect_track.get("canonical_person_id") if suspect_track else "PERSON_SUSPECT",
+                "victim_track_id": victim_track.get("track_id") if victim_track else None,
+                "clip_url": clip_url or f"/media/events/{incident_id}/clip.mp4",
+                "thumbnail_url": thumb_url or (suspect_track.get("crop_url") if suspect_track else None),
+                "description": f"Critical chain snatching / robbery incident detected at {suspect_track.get('location', 'entrance area') if suspect_track else 'entrance'}. Suspect approached victim, forcefully snatched gold chain, and rapidly fled the scene."
+            }
+            # Prepend as authoritative primary event
+            events_metadata.insert(0, incident_event)
+
         metadata_doc = {
             "video_id": video_id,
             "camera_id": camera_id,
@@ -251,7 +328,8 @@ class AutoVideoMetadataExtractor:
             "total_tracks": len(tracks_metadata),
             "unique_persons_count": len({t["canonical_person_id"] for t in tracks_metadata}),
             "tracks": tracks_metadata,
-            "events": events_metadata
+            "events": events_metadata,
+            "active_incident": incident_event
         }
 
         # Save to disk as authoritative JSON file

@@ -147,6 +147,30 @@ export function MessageList({ messages, isLoading, onSelectEvidence }: MessageLi
     const zone = contract.zone || 'Entrance (cam_auto_01)';
     const window = contract.evaluation_window || '00:00 - 01:50';
 
+    if (status === 'CRITICAL_ALERT' || status === 'INCIDENT_ALERT') {
+      return (
+        <div className="detection-banner banner-critical-alert" style={{
+          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.08) 100%)',
+          border: '1px solid rgba(239, 68, 68, 0.4)',
+          boxShadow: '0 0 15px rgba(239, 68, 68, 0.15)'
+        }}>
+          <div className="banner-header">
+            <div className="banner-title-wrap">
+              <ShieldAlert size={18} className="text-red-400 animate-pulse" />
+              <span className="banner-title text-red-400 font-bold tracking-wide">🚨 CRITICAL INCIDENT ALERT: ROBBERY / CHAIN SNATCHING DETECTED</span>
+            </div>
+            <div className="banner-count-badge" style={{ background: 'rgba(239, 68, 68, 0.25)', color: '#fca5a5', borderColor: 'rgba(239, 68, 68, 0.5)' }}>
+              <strong>10s Incident Clip</strong>
+            </div>
+          </div>
+          <div className="banner-meta-row" style={{ color: '#fecaca' }}>
+            <span><strong>Zone:</strong> {zone}</span>
+            <span><strong>Window:</strong> {window}</span>
+          </div>
+        </div>
+      );
+    }
+
     if (status === 'DETECTED') {
       return (
         <div className="detection-banner banner-detected">
